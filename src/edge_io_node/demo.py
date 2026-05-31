@@ -26,11 +26,15 @@ def main(argv: list[str] | None = None) -> int:
     if not args.toy:
         parser.error("Use --toy")
     out = run_toy()
+    out["consent_status"] = "opt_in_required_and_satisfied"
+    out["anonymization"] = "device_id_hash_only_no_pii"
     print(json.dumps(out, indent=2))
-    path = Path("results") / "edge_io_toy_export.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {path}")
+    e2e = Path("results") / "e2e"
+    e2e.mkdir(parents=True, exist_ok=True)
+    (e2e / "synthetic_telemetry.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+    seven_gc = {"exports": [s for s in out.get("samples", [])], "site_id": "gary"}
+    (e2e / "seven_gc_export.json").write_text(json.dumps(seven_gc, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote {e2e / 'synthetic_telemetry.json'} and {e2e / 'seven_gc_export.json'}")
     return 0
 
 
