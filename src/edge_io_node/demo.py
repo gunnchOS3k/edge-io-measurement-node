@@ -1,25 +1,38 @@
-"""Toy demo for edge measurement node."""
+"""Synthetic telemetry demo (privacy-preserving, opt-in required)."""
+from __future__ import annotations
+
 import argparse
 import json
-from edge_io_node.synthetic_device_emulator import emulate_sample
-from edge_io_node.exporters.seven_gc_export import export_sample
-from edge_io_node.telemetry_schema import TelemetrySample
+from pathlib import Path
+
+from .export_to_7gc import export_sample
+from .synthetic_device_emulator import emulate_samples
+from .telemetry_schema import TelemetrySample
 
 
-def main() -> None:
+def run_toy(n: int = 5) -> dict:
+    samples = []
+    for raw in emulate_samples(n):
+        s = TelemetrySample(**raw)
+        exported = export_sample(s.to_dict(), site_id="gary")
+        samples.append(exported)
+    return {"n_samples": len(samples), "samples": samples, "note": "synthetic opt-in telemetry"}
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--toy", action="store_true")
-    args = parser.parse_args()
-    raw = emulate_sample("hash_demo_device")
-    sample = TelemetrySample(
-        device_id_hash=raw["device_id_hash"],
-        timestamp_iso="2026-01-01T12:00:00Z",
-        latency_ms=raw.get("latency_ms"),
-        opt_in=True,
-    )
-    out = export_sample(sample)
+    args = parser.parse_args(argv)
+    if not args.toy:
+        parser.error("Use --toy")
+    out = run_toy()
     print(json.dumps(out, indent=2))
+    path = Path("results") / "edge_io_toy_export.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote {path}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

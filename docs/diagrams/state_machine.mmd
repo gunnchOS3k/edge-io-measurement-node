@@ -1,0 +1,9 @@
+stateDiagram-v2
+  [*] --> Start
+  consent
+  Validated --> opt-in
+  Validated --> measure
+  Validated --> anonymize
+  Validated --> export
+  Validated --> retention policy
+  Exported --> [*]

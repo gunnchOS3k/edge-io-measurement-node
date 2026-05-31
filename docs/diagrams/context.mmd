@@ -1,0 +1,10 @@
+flowchart TB
+  subgraph users [Users]
+    SUP[Supervisor]
+    RES[Researcher]
+    STU[Student]
+  end
+  SYS[edge-io-measurement-node]
+  TWIN[7gc-digital-twin]
+  users --> SYS
+  SYS --> TWIN
