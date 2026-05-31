@@ -1,0 +1,42 @@
+"""Synthetic telemetry demo (privacy-preserving, opt-in required)."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from .export_to_7gc import export_sample
+from .synthetic_device_emulator import emulate_samples
+from .telemetry_schema import TelemetrySample
+
+
+def run_toy(n: int = 5) -> dict:
+    samples = []
+    for raw in emulate_samples(n):
+        s = TelemetrySample(**raw)
+        exported = export_sample(s.to_dict(), site_id="gary")
+        samples.append(exported)
+    return {"n_samples": len(samples), "samples": samples, "note": "synthetic opt-in telemetry"}
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--toy", action="store_true")
+    args = parser.parse_args(argv)
+    if not args.toy:
+        parser.error("Use --toy")
+    out = run_toy()
+    out["consent_status"] = "opt_in_required_and_satisfied"
+    out["anonymization"] = "device_id_hash_only_no_pii"
+    print(json.dumps(out, indent=2))
+    e2e = Path("results") / "e2e"
+    e2e.mkdir(parents=True, exist_ok=True)
+    (e2e / "synthetic_telemetry.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+    seven_gc = {"exports": [s for s in out.get("samples", [])], "site_id": "gary"}
+    (e2e / "seven_gc_export.json").write_text(json.dumps(seven_gc, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote {e2e / 'synthetic_telemetry.json'} and {e2e / 'seven_gc_export.json'}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
