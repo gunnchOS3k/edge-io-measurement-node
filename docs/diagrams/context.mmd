@@ -1,10 +1,15 @@
 flowchart TB
-  subgraph users [Users]
-    SUP[Supervisor]
-    RES[Researcher]
-    STU[Student]
+  DEV[Synthetic device]
+  LRN[Learner opt-in]
+  subgraph SYS[edge_io_node]
+    SCH[telemetry_schema]
+    EMU[synthetic_device_emulator]
+    EXP[export_to_7gc]
   end
-  SYS[edge-io-measurement-node]
+  POL[Privacy policy docs]
   TWIN[7gc-digital-twin]
-  users --> SYS
-  SYS --> TWIN
+  LRN --> EMU
+  EMU --> SCH
+  SCH --> EXP
+  POL --> SCH
+  EXP --> TWIN
