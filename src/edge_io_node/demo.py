@@ -6,17 +6,30 @@ import json
 from pathlib import Path
 
 from .export_to_7gc import export_sample
+from .privacy import privacy_report, sanitize
 from .synthetic_device_emulator import emulate_samples
 from .telemetry_schema import TelemetrySample
 
 
 def run_toy(n: int = 5) -> dict:
-    samples = []
+    raw_samples = []
+    sanitized = []
+    exports = []
     for raw in emulate_samples(n):
-        s = TelemetrySample(**raw)
-        exported = export_sample(s.to_dict(), site_id="gary")
-        samples.append(exported)
-    return {"n_samples": len(samples), "samples": samples, "note": "synthetic opt-in telemetry"}
+        s = TelemetrySample.from_legacy(raw)
+        raw_samples.append(s.to_dict())
+        clean = sanitize(s.to_dict())
+        sanitized.append(clean)
+        exports.append(export_sample(clean, site_id="gary"))
+    return {
+        "n_samples": len(raw_samples),
+        "samples": raw_samples,
+        "sanitized": sanitized,
+        "exports": exports,
+        "consent_status": "opt_in_active",
+        "anonymization": "hash_only_no_pii",
+        "note": "synthetic opt-in telemetry",
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -26,15 +39,14 @@ def main(argv: list[str] | None = None) -> int:
     if not args.toy:
         parser.error("Use --toy")
     out = run_toy()
-    out["consent_status"] = "opt_in_required_and_satisfied"
-    out["anonymization"] = "device_id_hash_only_no_pii"
     print(json.dumps(out, indent=2))
     e2e = Path("results") / "e2e"
     e2e.mkdir(parents=True, exist_ok=True)
     (e2e / "synthetic_telemetry.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-    seven_gc = {"exports": [s for s in out.get("samples", [])], "site_id": "gary"}
-    (e2e / "seven_gc_export.json").write_text(json.dumps(seven_gc, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {e2e / 'synthetic_telemetry.json'} and {e2e / 'seven_gc_export.json'}")
+    (e2e / "sanitized_telemetry.json").write_text(json.dumps(out["sanitized"], indent=2) + "\n", encoding="utf-8")
+    (e2e / "seven_gc_export.json").write_text(json.dumps({"exports": out["exports"]}, indent=2) + "\n", encoding="utf-8")
+    (e2e / "privacy_report.md").write_text(privacy_report(out["sanitized"]), encoding="utf-8")
+    print(f"Wrote {e2e}")
     return 0
 
 

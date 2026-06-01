@@ -1,0 +1,2 @@
+- context.mmd: actors and telemetry_schema, privacy, demo
+- sequence_main_demo.mmd: demo command flow
