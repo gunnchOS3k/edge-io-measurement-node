@@ -1,0 +1,28 @@
+site_id: gaza
+allowed_measurements:
+- latency_ms
+- jitter_ms
+- packet_loss_pct
+- throughput_mbps_stub
+prohibited_measurements:
+- precise_gps
+- contact_list
+- message_content
+- biometrics
+consent_mode: explicit_opt_in
+privacy_tier: aggregate_only
+local_data_governance_notes: Community steering circle required before deployment
+expected_device_classes:
+- shared_tablet
+- community_kiosk
+- lab_handset
+low_bandwidth_mode: true
+offline_first_mode: true
+crisis_mode_restrictions:
+  no_location_tracking: true
+  no_person_identifiers: true
+  remote_first_only: true
+retention_policy: minimum_necessary_30d_stub
+export_target_7gc: results/campus_measurements/gaza_7gc_export.json
+gdpr_aware: false
+accessibility_checks: false
