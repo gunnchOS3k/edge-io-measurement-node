@@ -1,0 +1,19 @@
+{
+  "timestamp_utc": "2026-06-15T18:30:00Z",
+  "device_id_hash": "sha256_demo_device_001",
+  "location_label": "gary_library_waypoint_a",
+  "gps_precision_bucket": "coarse",
+  "network_type": "wifi",
+  "rssi_dbm": -62.0,
+  "latency_ms": 18.4,
+  "jitter_ms": 2.1,
+  "packet_loss_pct": 0.0,
+  "download_mbps": 42.5,
+  "upload_mbps": 8.2,
+  "cpu_pct": 21.0,
+  "battery_pct": 78.0,
+  "device_temp_c": 32.5,
+  "offline_ai_latency_ms": 95.0,
+  "consent_flag": true,
+  "notes_redacted": "synthetic_example_record; no payload capture"
+}

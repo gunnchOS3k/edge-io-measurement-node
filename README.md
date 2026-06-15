@@ -12,6 +12,41 @@
 | **Smoke test** | [E2E_RUN_RECORD.md](reproducibility/E2E_RUN_RECORD.md) |
 | **Artifacts** | [results/e2e/](results/e2e/) |
 
+## Current status
+
+| Doc | Purpose |
+|-----|---------|
+| [Telemetry schema](docs/TELEMETRY_SCHEMA.md) | Field record fields + JSON/CSV examples |
+| [Privacy & ethics](docs/PRIVACY_AND_ETHICS.md) | Consent, minimization, no payload capture |
+| [Field test protocol](docs/FIELD_TEST_PROTOCOL.md) | Pixel 6a / MacBook procedure |
+| [Android roadmap](docs/ANDROID_FIELD_CONSOLE_ROADMAP.md) | Phone-first console plan |
+| [Claims ↔ evidence](quality/CLAIMS_TO_EVIDENCE_MATRIX.md) | Honest evidence mapping |
+
+**Framing:** **Phone-first field console** for exploratory measurements — not citywide deployment or carrier-grade monitoring.
+
+## Quickstart
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+make test
+make smoke
+```
+
+Probe smoke (optional):
+
+```bash
+PYTHONPATH=src python3 -c "from edge_io_node.probes import probe_latency; print(probe_latency())"
+```
+
+## What this does not claim
+
+- Deployable **6G** or operational **AI-RAN**
+- Representative **citywide** field impact
+- **Certified** test hardware
+- Collection of **private third-party traffic** or packet payloads
+- **Unauthorized RF transmission** (SDR: receive-only observation only if discussed)
+
 Reframes **Edge-IO** and gunnchOS devices as **low-cost edge measurement endpoints** for 6G education, AI inference, and network quality measurement.
 
 > **Research prototype** — not certified consumer hardware. All collection **opt-in** and **privacy-preserving**.
