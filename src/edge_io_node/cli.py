@@ -16,9 +16,13 @@ from .collectors.base import (
     PhysicalDeviceCollector,
     delete_session,
 )
-from .consent.lifecycle import ConsentRecord
+from .consent.lifecycle import ConsentRecord, utc_now_iso
 from .contracts.validate import validate_batch
 from .exporters.seven_gc_export import export_batch_to_7gc
+
+
+COLLECTION_PURPOSE_VERSION = "gate3-pilot-v1"
+PRIVACY_POLICY_VERSION = "gate3-privacy-v1"
 
 
 def _cmd_collect(args: argparse.Namespace) -> int:
@@ -29,6 +33,7 @@ def _cmd_collect(args: argparse.Namespace) -> int:
             "Refusing to collect without --consent (affirmative opt-in required)"
         )
     consent.require_opt_in(site_id=args.site, run_id=args.run_id, affirmative=True)
+    consent_captured_at = consent.captured_at
 
     session = MeasurementSession(
         run_id=args.run_id,
@@ -39,16 +44,27 @@ def _cmd_collect(args: argparse.Namespace) -> int:
         retention_days=int(args.retention_days),
     )
 
-    if args.collector == "physical":
+    collector_mode = args.collector
+    if collector_mode in {"emulator", "synthetic"}:
+        print("SYNTHETIC TEST MODE", flush=True)
         collector: DeterministicEmulatorCollector | PhysicalDeviceCollector = (
-            PhysicalDeviceCollector()
+            DeterministicEmulatorCollector(seed=int(args.seed))
+        )
+        evidence = "synthetic"
+        device_category = "emulator"
+    else:
+        print("PHYSICAL DEVICE COLLECTION", flush=True)
+        collector = PhysicalDeviceCollector(
+            endpoint=args.endpoint,
+            timeout_s=float(args.timeout),
+            retries=int(args.retries),
+            device_category=args.device_category,
+            network_type=args.network_type,
         )
         evidence = "controlled_device_measurement"
-    else:
-        collector = DeterministicEmulatorCollector(seed=int(args.seed))
-        evidence = "synthetic"
+        device_category = args.device_category
 
-    # Physical collector raises immediately if no device is connected.
+    start = utc_now_iso()
     collector.start(session)
     interval = max(1.0, float(args.interval))
     deadline = time.time() + float(args.duration)
@@ -61,46 +77,105 @@ def _cmd_collect(args: argparse.Namespace) -> int:
             break
         time.sleep(min(interval, remaining))
 
-    if args.collector == "emulator":
-        batch = collector.stop()
-        # ensure evidence label remains synthetic
-        assert batch.payload["evidence_level"] == evidence
-    else:  # pragma: no cover - physical path blocked earlier
-        batch = collector.stop()
-
+    batch = collector.stop()
+    end = utc_now_iso()
     out = Path(args.output)
-    batch.write(out)
-    print(json.dumps({"wrote": str(out), "evidence_level": evidence, "n": len(session.samples)}, indent=2))
+    # Wrap with session context for Gate 3
+    context = {
+        "schema_name": "gunnchos.measurement_session_context",
+        "schema_version": "1.0.0",
+        "session_id": args.session_id or f"sess_{args.run_id}",
+        "run_id": args.run_id,
+        "collection_day_id": args.collection_day_id or "day_unassigned",
+        "location_category": args.location_category,
+        "named_test_zone": args.zone,
+        "indoor_outdoor": args.indoor_outdoor,
+        "stationary_or_moving": args.mobility,
+        "network_condition": args.network_condition,
+        "network_type": args.network_type,
+        "workload_profile": args.profile,
+        "planned_duration_seconds": float(args.duration),
+        "actual_duration_seconds": float(session.elapsed_s()),
+        "start_timestamp": start,
+        "end_timestamp": end,
+        "device_category": device_category if device_category != "emulator" else "laptop",
+        "collector_version": "0.2.0-gate3",
+        "consent_receipt_id": consent.receipt_id,
+        "consent_captured_at": consent_captured_at,
+        "collection_purpose_version": COLLECTION_PURPOSE_VERSION,
+        "privacy_policy_version": PRIVACY_POLICY_VERSION,
+        "environmental_notes": args.environmental_notes,
+        "degradation_method": args.degradation_method,
+        "operator_notes": args.operator_notes,
+        "protocol_deviation": args.protocol_deviation or None,
+        "evidence_level": evidence,
+    }
+    if evidence == "synthetic":
+        # Keep device_category schema-valid for context while batch remains synthetic
+        context["device_category"] = "laptop"
+    wrapped = {
+        "measurement_batch": batch.to_dict(),
+        "session_context": context,
+        "collection_mode_label": (
+            "PHYSICAL DEVICE COLLECTION" if evidence == "controlled_device_measurement" else "SYNTHETIC TEST MODE"
+        ),
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    # For Gate 2 pipeline compatibility, also allow writing bare batch when --bare-batch
+    if args.bare_batch:
+        batch.write(out)
+    else:
+        out.write_text(json.dumps(wrapped, indent=2) + "\n", encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "wrote": str(out),
+                "evidence_level": evidence,
+                "mode": wrapped["collection_mode_label"],
+                "n": len(session.samples),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
 def _cmd_validate(args: argparse.Namespace) -> int:
-    result = validate_batch(Path(args.path), schema_dir=args.schema_dir)
+    path = Path(args.path)
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    batch = doc.get("measurement_batch", doc)
+    result = validate_batch(batch, schema_dir=args.schema_dir)
     print(json.dumps(result, indent=2))
     return 0
 
 
 def _cmd_export_to_7gc_file(args: argparse.Namespace) -> int:
-    path = export_batch_to_7gc(
-        Path(args.input),
-        Path(args.output),
-        schema_dir=args.schema_dir,
-    )
+    path_in = Path(args.input)
+    doc = json.loads(path_in.read_text(encoding="utf-8"))
+    if "measurement_batch" in doc:
+        tmp = path_in.with_suffix(".batch.json")
+        tmp.write_text(json.dumps(doc["measurement_batch"], indent=2) + "\n", encoding="utf-8")
+        path = export_batch_to_7gc(tmp, Path(args.output), schema_dir=args.schema_dir)
+        tmp.unlink(missing_ok=True)
+    else:
+        path = export_batch_to_7gc(path_in, Path(args.output), schema_dir=args.schema_dir)
     print(str(path))
     return 0
 
 
 def _cmd_withdraw(args: argparse.Namespace) -> int:
-    # Session-file based withdrawal helper for tests / local client
     path = Path(args.session)
     doc = json.loads(path.read_text(encoding="utf-8"))
-    if "consent" not in doc:
+    batch = doc.get("measurement_batch", doc)
+    if "consent" not in batch:
         raise SystemExit("Session file missing consent block")
-    doc["consent"]["status"] = "withdrawn"
-    from .consent.lifecycle import utc_now_iso
-
-    doc["consent"]["withdrawn_at"] = utc_now_iso()
-    path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    batch["consent"]["status"] = "withdrawn"
+    batch["consent"]["withdrawn_at"] = utc_now_iso()
+    if "measurement_batch" in doc:
+        doc["measurement_batch"] = batch
+        path.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    else:
+        path.write_text(json.dumps(batch, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"withdrawn": str(path)}, indent=2))
     return 0
 
@@ -108,6 +183,9 @@ def _cmd_withdraw(args: argparse.Namespace) -> int:
 def _cmd_delete_session(args: argparse.Namespace) -> int:
     path = Path(args.session)
     if path.exists():
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        doc["deleted"] = True
+        # remove file to match delete semantics
         path.unlink()
     print(json.dumps({"deleted": str(path)}, indent=2))
     return 0
@@ -117,7 +195,6 @@ def main(argv=None):
     p = argparse.ArgumentParser(prog="edge-io")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    # Legacy campus commands
     sub.add_parser("list-campus-profiles").set_defaults(
         func=lambda a: print("\n".join(list_campus_profiles())) or 0
     )
@@ -138,23 +215,54 @@ def main(argv=None):
     pr.add_argument("site_id")
     pr.set_defaults(func=lambda a: write_campus_bundle(a.site_id) or 0)
 
-    # Gate 2 commands
     collect = sub.add_parser("collect", help="Collect a measurement session")
     collect.add_argument("--profile", choices=["learn", "create", "sense"], required=True)
     collect.add_argument("--duration", type=float, default=300)
     collect.add_argument("--interval", type=float, default=30)
     collect.add_argument("--site", default="gary")
     collect.add_argument("--run-id", required=True)
+    collect.add_argument("--session-id", default=None)
     collect.add_argument("--output", required=True)
     collect.add_argument("--consent", action="store_true", help="Affirmative opt-in")
     collect.add_argument(
         "--collector",
-        choices=["emulator", "physical"],
-        default="emulator",
-        help="emulator=synthetic; physical requires a connected device",
+        choices=["emulator", "synthetic", "physical"],
+        default="synthetic",
+        help="synthetic/emulator=labeled synthetic; physical=device probe",
     )
     collect.add_argument("--seed", type=int, default=7)
     collect.add_argument("--retention-days", type=int, default=30)
+    collect.add_argument("--device-category", default="laptop", choices=["phone", "tablet", "laptop", "kiosk"])
+    collect.add_argument("--zone", default="zone_a")
+    collect.add_argument(
+        "--location-category",
+        default="library_or_community_indoor",
+        choices=[
+            "home_or_private_indoor",
+            "library_or_community_indoor",
+            "campus_or_office_indoor",
+            "outdoor_stationary",
+            "transit_or_mobility",
+            "other_approved_test_zone",
+        ],
+    )
+    collect.add_argument(
+        "--network-condition",
+        default="wifi_normal",
+        choices=["wifi_normal", "cellular_normal", "wifi_degraded", "local_network_degraded"],
+    )
+    collect.add_argument("--network-type", default="wifi", choices=["wifi", "cellular", "ethernet", "unknown", "degraded_local"])
+    collect.add_argument("--collection-day-id", default=None)
+    collect.add_argument("--indoor-outdoor", default="indoor", choices=["indoor", "outdoor", "mixed"])
+    collect.add_argument("--mobility", default="stationary", choices=["stationary", "moving"])
+    collect.add_argument("--endpoint", default="https://www.cloudflare.com/cdn-cgi/trace")
+    collect.add_argument("--timeout", type=float, default=5.0)
+    collect.add_argument("--retries", type=int, default=1)
+    collect.add_argument("--environmental-notes", default="")
+    collect.add_argument("--degradation-method", default="none")
+    collect.add_argument("--operator-notes", default="")
+    collect.add_argument("--protocol-deviation", default="")
+    collect.add_argument("--bare-batch", action="store_true", help="Write Gate-2 bare batch JSON only")
     collect.set_defaults(func=_cmd_collect)
 
     validate = sub.add_parser("validate", help="Validate a measurement batch")
