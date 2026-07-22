@@ -26,6 +26,9 @@ class MeasurementSessionController(
             plannedDurationSeconds = plannedDurationSeconds,
             calibrationOnly = calibrationOnly,
             samples = emptyList(),
+            consentStatusAtStart = consent.state.status,
+            consentReceiptIdAtStart = consent.state.receiptId,
+            consentCapturedAtIsoAtStart = consent.state.capturedAtIso,
         )
     }
 

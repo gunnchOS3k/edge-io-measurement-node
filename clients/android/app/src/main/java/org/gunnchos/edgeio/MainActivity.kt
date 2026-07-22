@@ -1,12 +1,15 @@
 package org.gunnchos.edgeio
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import org.gunnchos.edgeio.databinding.ActivityMainBinding
@@ -23,6 +26,26 @@ class MainActivity : AppCompatActivity() {
     private val physicalMode: Boolean = true
     private var startedAtElapsed: Long = 0L
     private val plannedDurationSeconds = 60.0
+    private var lastExportFile: File? = null
+
+    private val createDocument =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            val src = lastExportFile
+            if (uri == null || src == null || !src.exists()) {
+                binding.status.text = "Save cancelled; cache JSON retained: ${src?.name ?: "(none)"}"
+                return@registerForActivityResult
+            }
+            try {
+                contentResolver.openOutputStream(uri)?.use { out ->
+                    src.inputStream().use { input -> input.copyTo(out) }
+                } ?: error("Unable to open destination for write")
+                binding.status.text = "Saved via document picker: ${src.name} (${src.length()} bytes). Session retained."
+            } catch (e: Exception) {
+                logExportFailure("document_save", e)
+                binding.status.text = "Document save failed: ${e.javaClass.simpleName}: ${e.message}. Cache file retained: ${src.name}"
+                Toast.makeText(this, "Save failed — see on-screen status for full diagnostic", Toast.LENGTH_LONG).show()
+            }
+        }
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -126,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         binding.withdrawBtn.setOnClickListener {
             try {
                 consent.withdraw()
-                binding.status.text = "Consent withdrawn"
+                binding.status.text = "Consent withdrawn (prior session export still uses frozen start-of-session consent)"
             } catch (e: Exception) {
                 Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
             }
@@ -146,37 +169,77 @@ class MainActivity : AppCompatActivity() {
         binding.modeLabel.setTextColor(0xFF0B6E4F.toInt())
     }
 
+    private fun fileProviderAuthority(): String =
+        EdgeIoFileProvider.authority(BuildConfig.APPLICATION_ID)
+
+    private fun writeSessionJson(): File {
+        val session = controller.session ?: error("No session to export")
+        if (session.endedAtEpochMs == null) controller.stop()
+        val active = controller.session ?: session
+        val json = SessionExporter.toJson(
+            session = active,
+            consent = consent,
+            physical = true,
+            zone = binding.zoneSpinner.selectedItem as String,
+            networkCondition = binding.networkSpinner.selectedItem as String,
+            locationCategory = "home_or_private_indoor",
+            deviceCategory = "phone",
+            modelLabel = "pixel_6a",
+            networkType = "wifi",
+        )
+        val out = File(cacheDir, "${active.runId}.json")
+        out.writeText(json)
+        check(out.exists() && out.length() > 0L) { "Export write failed: empty or missing ${out.name}" }
+        lastExportFile = out
+        return out
+    }
+
     private fun exportSession() {
-        val session = controller.session
-        if (session == null) {
+        if (controller.session == null && lastExportFile?.exists() != true) {
             Toast.makeText(this, "No session to export", Toast.LENGTH_LONG).show()
             return
         }
-        if (session.endedAtEpochMs == null) controller.stop()
         try {
-            val json = SessionExporter.toJson(
-                session = session,
-                consent = consent,
-                physical = true,
-                zone = binding.zoneSpinner.selectedItem as String,
-                networkCondition = binding.networkSpinner.selectedItem as String,
-                locationCategory = "home_or_private_indoor",
-                deviceCategory = "phone",
-                modelLabel = "pixel_6a",
-                networkType = "wifi",
-            )
-            val out = File(cacheDir, "${session.runId}.json")
-            out.writeText(json)
-            val uri = FileProvider.getUriForFile(this, "$packageName.files", out)
+            val out = if (controller.session != null) {
+                writeSessionJson()
+            } else {
+                lastExportFile!!
+            }
+            binding.status.text = "Wrote ${out.name} (${out.length()} bytes) to app cache. Opening share…"
+            val authority = fileProviderAuthority()
+            val uri = FileProvider.getUriForFile(this, authority, out)
             val share = Intent(Intent.ACTION_SEND).apply {
                 type = "application/json"
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            startActivity(Intent.createChooser(share, "Export Edge-IO session"))
-            binding.status.text = "Export ready: ${out.name}"
+            try {
+                startActivity(Intent.createChooser(share, "Export Edge-IO session"))
+                binding.status.text =
+                    "Share open: ${out.name} (${out.length()} bytes). Authority=$authority. Session retained — EXPORT again or Save to Downloads if needed."
+            } catch (shareError: Exception) {
+                logExportFailure("share_chooser", shareError)
+                binding.status.text =
+                    "Share failed (${shareError.javaClass.simpleName}: ${shareError.message}). JSON retained at ${out.name}. Opening Save to Downloads…"
+                createDocument.launch(out.name)
+            }
         } catch (e: Exception) {
-            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+            logExportFailure("exportSession", e)
+            val retained = lastExportFile?.let { " Retained cache file: ${it.name} (${it.length()} bytes)." } ?: ""
+            val msg = "Export failed: ${e.javaClass.name}: ${e.message}.$retained Session NOT deleted."
+            binding.status.text = msg
+            Log.e(TAG, msg, e)
+            Toast.makeText(this, "Export failed — see on-screen status (full diagnostic)", Toast.LENGTH_LONG).show()
+            // Offer document picker as secondary path when share metadata fails
+            lastExportFile?.takeIf { it.exists() && it.length() > 0L }?.let { createDocument.launch(it.name) }
         }
+    }
+
+    private fun logExportFailure(stage: String, e: Exception) {
+        Log.e(TAG, "export_failure stage=$stage class=${e.javaClass.name} message=${e.message}", e)
+    }
+
+    companion object {
+        private const val TAG = "EdgeIoExport"
     }
 }

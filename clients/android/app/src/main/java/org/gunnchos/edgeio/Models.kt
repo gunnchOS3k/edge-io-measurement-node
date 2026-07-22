@@ -35,4 +35,8 @@ data class SessionState(
     val plannedDurationSeconds: Double = 60.0,
     val samples: List<MetricSample> = emptyList(),
     val calibrationOnly: Boolean = false,
+    /** Consent frozen at session start so later withdrawal cannot rewrite collection evidence. */
+    val consentStatusAtStart: String? = null,
+    val consentReceiptIdAtStart: String? = null,
+    val consentCapturedAtIsoAtStart: String? = null,
 )

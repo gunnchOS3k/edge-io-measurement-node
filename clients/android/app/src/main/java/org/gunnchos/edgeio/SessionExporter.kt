@@ -24,6 +24,7 @@ object SessionExporter {
         deviceCategory: String = "phone",
         modelLabel: String = "pixel_6a",
         networkType: String = "wifi",
+        producerCommit: String = BuildConfig.GIT_COMMIT,
     ): String {
         require(physical) { "Production export path refuses synthetic collector substitution" }
         val evidence = "controlled_device_measurement"
@@ -31,8 +32,15 @@ object SessionExporter {
         val startMs = session.startedAtEpochMs ?: error("session missing start")
         val endMs = session.endedAtEpochMs ?: System.currentTimeMillis()
         val actualDuration = ((endMs - startMs).coerceAtLeast(0)).toDouble() / 1000.0
-        val consentAt = consent.state.capturedAtIso ?: error("consent timestamp required")
-        val receipt = consent.state.receiptId ?: error("consent receipt required")
+        // Prefer consent frozen at collection start so a later withdrawal does not rewrite evidence.
+        val consentAt = session.consentCapturedAtIsoAtStart
+            ?: consent.state.capturedAtIso
+            ?: error("consent timestamp required")
+        val receipt = session.consentReceiptIdAtStart
+            ?: consent.state.receiptId
+            ?: error("consent receipt required")
+        val consentStatus = session.consentStatusAtStart
+            ?: consent.state.status
 
         val measurements = JSONArray()
         for (s in session.samples) {
@@ -69,13 +77,13 @@ object SessionExporter {
             "producer",
             JSONObject()
                 .put("repository", "edge-io-measurement-node")
-                .put("commit", "unknown_local_build")
-                .put("client_version", "0.3.1-gate3-android"),
+                .put("commit", producerCommit)
+                .put("client_version", BuildConfig.VERSION_NAME),
         )
         batch.put(
             "consent",
             JSONObject()
-                .put("status", consent.state.status)
+                .put("status", consentStatus)
                 .put("receipt_id", receipt)
                 .put("withdrawal_supported", true)
                 .put("captured_at", consentAt),
@@ -138,7 +146,7 @@ object SessionExporter {
         context.put("start_timestamp", isoFromEpoch(startMs))
         context.put("end_timestamp", isoFromEpoch(endMs))
         context.put("device_category", deviceCategory)
-        context.put("collector_version", "0.3.1-gate3-android")
+        context.put("collector_version", BuildConfig.VERSION_NAME)
         context.put("consent_receipt_id", receipt)
         context.put("consent_captured_at", consentAt)
         context.put("collection_purpose_version", "gate3-pilot-v1")
