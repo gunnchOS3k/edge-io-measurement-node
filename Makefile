@@ -1,12 +1,24 @@
-.PHONY: test demo e2e
+.PHONY: setup lint test contract-test demo e2e clean
 
 PY := PYTHONPATH=src
+
+setup:
+	python3 -m pip install -r requirements.txt
+
+lint:
+	$(PY) python3 -m compileall -q src
 
 test:
 	$(PY) pytest -q
 
+contract-test:
+	$(PY) pytest -q tests/contracts
+
 demo:
 	$(PY) python3 -m edge_io_node.demo --toy
+
+clean:
+	rm -rf results/session.json results/01_edge_measurements.json
 
 e2e:
 	@mkdir -p results/e2e results/campus_measurements
