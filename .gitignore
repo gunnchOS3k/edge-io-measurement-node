@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 results/
+clients/android/.gradle/
+clients/android/local.properties
+clients/android/app/build/
+clients/android/build/
+*.apk

@@ -40,3 +40,19 @@ e2e-tooling:
 
 e2e-sionna e2e-deepmimo e2e-aerial e2e-oran:
 	@echo "Optional target $@ — requires external install; not run in default CI"
+
+ANDROID_DIR := clients/android
+
+android-debug-apk:
+	cd $(ANDROID_DIR) && (./gradlew :app:assembleDebug || gradle :app:assembleDebug || (echo "Android SDK/Gradle unavailable; see docs/GATE3_ANDROID_SETUP.md" && exit 1))
+
+android-install:
+	@APK=$$(ls $(ANDROID_DIR)/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n1); \
+	test -n "$$APK" || (echo "No APK; run make android-debug-apk" && exit 1); \
+	adb devices; adb install -r "$$APK"
+
+android-test:
+	cd $(ANDROID_DIR) && (./gradlew :app:testDebugUnitTest || echo "unit tests require Android Gradle toolchain")
+
+android-export-check:
+	@echo "Export check requires a device session file; validate with field-kit scripts/validate_session.py"
