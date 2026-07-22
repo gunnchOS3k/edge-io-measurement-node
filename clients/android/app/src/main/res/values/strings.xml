@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Edge-IO Measurement</string>
+    <string name="collection_summary">This session collects application, device, network, and workload metrics only. It does not collect GPS, email, phone number, student ID, IMEI, IMSI, MAC, SSID/BSSID, or advertising IDs.</string>
+    <string name="mode_physical">PHYSICAL DEVICE COLLECTION</string>
+    <string name="mode_synthetic">SYNTHETIC TEST MODE</string>
+</resources>
