@@ -146,15 +146,27 @@ def test_export_validates_against_canonical_schema(tmp_path, active_consent):
     validate_batch(out, schema_dir=SCHEMA_DIR)
 
 
-def test_physical_collector_does_not_emulate():
+def test_physical_collector_requires_endpoint_health(monkeypatch):
     c = ConsentRecord()
     c.acknowledge_summary()
     c.require_opt_in(site_id="gary", run_id="phys", affirmative=True)
     session = MeasurementSession(
         run_id="phys", site_id="gary", profile="learn", duration_s=10, consent=c
     )
-    with pytest.raises(RuntimeError, match="No physical measurement backend"):
-        PhysicalDeviceCollector().start(session)
+    collector = PhysicalDeviceCollector(endpoint="https://invalid.invalid")
+    with pytest.raises(RuntimeError, match="health check failed"):
+        collector.start(session)
+
+
+def test_synthetic_and_physical_modes_are_labeled(active_consent):
+    session = MeasurementSession(
+        run_id="r10", site_id="gary", profile="learn", duration_s=10, consent=active_consent
+    )
+    collector = DeterministicEmulatorCollector()
+    collector.start(session)
+    batch = collector.stop()
+    assert batch.payload["evidence_level"] == "synthetic"
+    assert "emulator" in batch.payload["provenance"]["collector"]
 
 
 def test_valid_fixture_from_field_kit():
