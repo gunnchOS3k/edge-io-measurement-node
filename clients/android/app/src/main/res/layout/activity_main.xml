@@ -7,18 +7,19 @@
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView android:id="@+id/modeLabel" android:textStyle="bold" android:textSize="18sp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView android:id="@+id/modeLabel" android:textStyle="bold" android:textSize="20sp" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <TextView android:id="@+id/summary" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <CheckBox android:id="@+id/ackSummary" android:text="I acknowledge the collection summary" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <CheckBox android:id="@+id/optIn" android:text="I affirmatively opt in" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/calibrationOnly" android:text="Calibration only (not a pilot session)" android:checked="true" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Spinner android:id="@+id/profileSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Spinner android:id="@+id/zoneSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Spinner android:id="@+id/networkSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:id="@+id/timer" android:text="00:00" android:textSize="24sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView android:id="@+id/timer" android:text="00:00 / 01:00" android:textSize="24sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <TextView android:id="@+id/receipt" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/startBtn" android:text="Start" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <Button android:id="@+id/startBtn" android:text="Start 60s calibration" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Button android:id="@+id/stopBtn" android:text="Stop" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/exportBtn" android:text="Export" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <Button android:id="@+id/exportBtn" android:text="Export session" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Button android:id="@+id/deleteBtn" android:text="Delete session" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <Button android:id="@+id/withdrawBtn" android:text="Withdraw consent" android:layout_width="match_parent" android:layout_height="wrap_content" />
         <TextView android:id="@+id/status" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" />

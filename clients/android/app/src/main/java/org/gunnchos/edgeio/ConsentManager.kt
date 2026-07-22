@@ -1,6 +1,10 @@
 package org.gunnchos.edgeio
 
 import java.security.MessageDigest
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import java.util.UUID
 
 class ConsentManager {
@@ -22,6 +26,7 @@ class ConsentManager {
             summaryAcknowledged = true,
             status = "active",
             receiptId = "rcpt_$digest",
+            capturedAtIso = utcNowIso(),
         )
         return state
     }
@@ -33,5 +38,13 @@ class ConsentManager {
 
     fun ensureActive() {
         check(state.status == "active") { "Collection blocked without active consent" }
+    }
+
+    companion object {
+        fun utcNowIso(): String {
+            val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+            fmt.timeZone = TimeZone.getTimeZone("UTC")
+            return fmt.format(Date())
+        }
     }
 }

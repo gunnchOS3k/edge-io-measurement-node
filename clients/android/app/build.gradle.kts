@@ -11,8 +11,8 @@ android {
         applicationId = "org.gunnchos.edgeio"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.3.0-gate3"
+        versionCode = 4
+        versionName = "0.3.1-gate3-android"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -43,4 +43,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     testImplementation("junit:junit:4.13.2")
+    // JVM unit tests need a real org.json implementation (Android stubs are not mocked).
+    testImplementation("org.json:json:20240303")
 }
