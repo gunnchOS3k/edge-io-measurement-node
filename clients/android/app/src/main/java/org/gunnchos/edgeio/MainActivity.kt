@@ -1,28 +1,85 @@
 package org.gunnchos.edgeio
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import org.gunnchos.edgeio.databinding.ActivityMainBinding
 import java.io.File
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val consent = ConsentManager()
     private val controller = MeasurementSessionController(consent)
-    private var physicalMode: Boolean = true
+    private lateinit var sampler: PhysicalMetricsSampler
+    private val sampleExecutor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val physicalMode: Boolean = true
     private var startedAtElapsed: Long = 0L
+    private val plannedDurationSeconds = 60.0
+    private var lastExportFile: File? = null
+
+    private val createDocument =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            val src = lastExportFile
+            if (uri == null || src == null || !src.exists()) {
+                binding.status.text = "Save cancelled; cache JSON retained: ${src?.name ?: "(none)"}"
+                return@registerForActivityResult
+            }
+            try {
+                contentResolver.openOutputStream(uri)?.use { out ->
+                    src.inputStream().use { input -> input.copyTo(out) }
+                } ?: error("Unable to open destination for write")
+                binding.status.text = "Saved via document picker: ${src.name} (${src.length()} bytes). Session retained."
+            } catch (e: Exception) {
+                logExportFailure("document_save", e)
+                binding.status.text = "Document save failed: ${e.javaClass.simpleName}: ${e.message}. Cache file retained: ${src.name}"
+                Toast.makeText(this, "Save failed — see on-screen status for full diagnostic", Toast.LENGTH_LONG).show()
+            }
+        }
+
     private val ticker = object : Runnable {
         override fun run() {
-            if (controller.session?.startedAtEpochMs != null) {
+            val session = controller.session
+            if (session?.startedAtEpochMs != null && session.endedAtEpochMs == null) {
                 val elapsed = (SystemClock.elapsedRealtime() - startedAtElapsed) / 1000
-                binding.timer.text = "%02d:%02d".format(elapsed / 60, elapsed % 60)
-                binding.timer.postDelayed(this, 1000)
+                binding.timer.text = "%02d:%02d / 01:00".format(elapsed / 60, elapsed % 60)
+                if (elapsed >= plannedDurationSeconds.toLong()) {
+                    stopCollection("Timer finished")
+                } else {
+                    binding.timer.postDelayed(this, 1000)
+                }
             }
+        }
+    }
+
+    private val sampleLoop = object : Runnable {
+        override fun run() {
+            val session = controller.session ?: return
+            if (session.endedAtEpochMs != null) return
+            sampleExecutor.execute {
+                val sample = sampler.sample(
+                    profile = session.profile,
+                    networkTypeHint = "wifi",
+                )
+                mainHandler.post {
+                    if (controller.session?.endedAtEpochMs == null) {
+                        controller.addSample(sample)
+                        binding.status.text =
+                            "Collecting sample #${controller.session?.samples?.size ?: 0}"
+                    }
+                }
+            }
+            mainHandler.postDelayed(this, 5000)
         }
     }
 
@@ -30,18 +87,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sampler = PhysicalMetricsSampler(applicationContext)
         binding.summary.text = getString(R.string.collection_summary)
         updateModeLabel()
-        binding.profileSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("learn", "create", "sense"))
-        binding.zoneSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("zone_a", "zone_b", "zone_c"))
-        binding.networkSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("wifi_normal", "wifi_degraded", "cellular_normal", "local_network_degraded"))
+        binding.profileSpinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            listOf("learn", "create", "sense"),
+        )
+        binding.zoneSpinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            listOf("zone_calibration", "zone_a", "zone_b", "zone_c"),
+        )
+        binding.networkSpinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            listOf("wifi_normal", "wifi_degraded", "cellular_normal", "local_network_degraded"),
+        )
 
-        binding.ackSummary.setOnCheckedChangeListener { _, checked -> if (checked) consent.acknowledgeSummary() }
+        binding.ackSummary.setOnCheckedChangeListener { _, checked ->
+            if (checked) consent.acknowledgeSummary()
+        }
         binding.optIn.setOnCheckedChangeListener { _, checked ->
             if (checked) {
                 try {
                     val state = consent.optIn("gary", "android-${System.currentTimeMillis()}")
-                    binding.receipt.text = "Receipt: ${state.receiptId}"
+                    binding.receipt.text = "Receipt: ${state.receiptId}\nConsent at: ${state.capturedAtIso}"
                 } catch (e: Exception) {
                     binding.optIn.isChecked = false
                     Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
@@ -51,23 +123,24 @@ class MainActivity : AppCompatActivity() {
         binding.startBtn.setOnClickListener {
             try {
                 if (!physicalMode) throw IllegalStateException("Production UI refuses synthetic collector")
+                if (!binding.optIn.isChecked) throw IllegalStateException("Affirmative consent required")
                 controller.start(
-                    runId = "android-${System.currentTimeMillis()}",
+                    runId = "pixel-cal-${System.currentTimeMillis()}",
                     siteId = "gary",
                     profile = binding.profileSpinner.selectedItem as String,
+                    plannedDurationSeconds = plannedDurationSeconds,
+                    calibrationOnly = binding.calibrationOnly.isChecked,
                 )
                 startedAtElapsed = SystemClock.elapsedRealtime()
                 binding.timer.post(ticker)
-                binding.status.text = "Collecting (${binding.zoneSpinner.selectedItem}/${binding.networkSpinner.selectedItem})"
+                mainHandler.post(sampleLoop)
+                binding.status.text =
+                    "PHYSICAL collecting (${binding.zoneSpinner.selectedItem}/${binding.networkSpinner.selectedItem})"
             } catch (e: Exception) {
                 Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
             }
         }
-        binding.stopBtn.setOnClickListener {
-            controller.stop()
-            binding.timer.removeCallbacks(ticker)
-            binding.status.text = "Stopped"
-        }
+        binding.stopBtn.setOnClickListener { stopCollection("Stopped by operator") }
         binding.exportBtn.setOnClickListener { exportSession() }
         binding.deleteBtn.setOnClickListener {
             controller.delete()
@@ -76,33 +149,97 @@ class MainActivity : AppCompatActivity() {
         binding.withdrawBtn.setOnClickListener {
             try {
                 consent.withdraw()
-                binding.status.text = "Consent withdrawn"
+                binding.status.text = "Consent withdrawn (prior session export still uses frozen start-of-session consent)"
             } catch (e: Exception) {
                 Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
             }
         }
     }
 
+    private fun stopCollection(reason: String) {
+        binding.timer.removeCallbacks(ticker)
+        mainHandler.removeCallbacks(sampleLoop)
+        controller.stop()
+        val n = controller.session?.samples?.size ?: 0
+        binding.status.text = "$reason — samples=$n. Export when ready."
+    }
+
     private fun updateModeLabel() {
-        binding.modeLabel.text = if (physicalMode) getString(R.string.mode_physical) else getString(R.string.mode_synthetic)
+        binding.modeLabel.text = getString(R.string.mode_physical)
+        binding.modeLabel.setTextColor(0xFF0B6E4F.toInt())
+    }
+
+    private fun fileProviderAuthority(): String =
+        EdgeIoFileProvider.authority(BuildConfig.APPLICATION_ID)
+
+    private fun writeSessionJson(): File {
+        val session = controller.session ?: error("No session to export")
+        if (session.endedAtEpochMs == null) controller.stop()
+        val active = controller.session ?: session
+        val json = SessionExporter.toJson(
+            session = active,
+            consent = consent,
+            physical = true,
+            zone = binding.zoneSpinner.selectedItem as String,
+            networkCondition = binding.networkSpinner.selectedItem as String,
+            locationCategory = "home_or_private_indoor",
+            deviceCategory = "phone",
+            modelLabel = "pixel_6a",
+            networkType = "wifi",
+        )
+        val out = File(cacheDir, "${active.runId}.json")
+        out.writeText(json)
+        check(out.exists() && out.length() > 0L) { "Export write failed: empty or missing ${out.name}" }
+        lastExportFile = out
+        return out
     }
 
     private fun exportSession() {
-        val session = controller.session ?: run {
-            Toast.makeText(this, "No session", Toast.LENGTH_SHORT).show()
+        if (controller.session == null && lastExportFile?.exists() != true) {
+            Toast.makeText(this, "No session to export", Toast.LENGTH_LONG).show()
             return
         }
-        val file = File(cacheDir, "${session.runId}.json")
-        file.writeText(SessionExporter.toJson(session, consent, physicalMode,
-            binding.zoneSpinner.selectedItem as String,
-            binding.networkSpinner.selectedItem as String))
-        val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
-        val share = Intent(Intent.ACTION_SEND).apply {
-            type = "application/json"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        try {
+            val out = if (controller.session != null) {
+                writeSessionJson()
+            } else {
+                lastExportFile!!
+            }
+            binding.status.text = "Wrote ${out.name} (${out.length()} bytes) to app cache. Opening share…"
+            val authority = fileProviderAuthority()
+            val uri = FileProvider.getUriForFile(this, authority, out)
+            val share = Intent(Intent.ACTION_SEND).apply {
+                type = "application/json"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            try {
+                startActivity(Intent.createChooser(share, "Export Edge-IO session"))
+                binding.status.text =
+                    "Share open: ${out.name} (${out.length()} bytes). Authority=$authority. Session retained — EXPORT again or Save to Downloads if needed."
+            } catch (shareError: Exception) {
+                logExportFailure("share_chooser", shareError)
+                binding.status.text =
+                    "Share failed (${shareError.javaClass.simpleName}: ${shareError.message}). JSON retained at ${out.name}. Opening Save to Downloads…"
+                createDocument.launch(out.name)
+            }
+        } catch (e: Exception) {
+            logExportFailure("exportSession", e)
+            val retained = lastExportFile?.let { " Retained cache file: ${it.name} (${it.length()} bytes)." } ?: ""
+            val msg = "Export failed: ${e.javaClass.name}: ${e.message}.$retained Session NOT deleted."
+            binding.status.text = msg
+            Log.e(TAG, msg, e)
+            Toast.makeText(this, "Export failed — see on-screen status (full diagnostic)", Toast.LENGTH_LONG).show()
+            // Offer document picker as secondary path when share metadata fails
+            lastExportFile?.takeIf { it.exists() && it.length() > 0L }?.let { createDocument.launch(it.name) }
         }
-        startActivity(Intent.createChooser(share, "Export Edge-IO session"))
-        binding.status.text = "Exported ${file.name}"
+    }
+
+    private fun logExportFailure(stage: String, e: Exception) {
+        Log.e(TAG, "export_failure stage=$stage class=${e.javaClass.name} message=${e.message}", e)
+    }
+
+    companion object {
+        private const val TAG = "EdgeIoExport"
     }
 }

@@ -7,3 +7,9 @@ clients/android/local.properties
 clients/android/app/build/
 clients/android/build/
 *.apk
+
+# Local Android APK artifacts (checksum/report may be committed)
+results/android/*.apk
+results/calibration/raw/
+results/android/_ignored_local/
+results/calibration/**/_ignored_raw/

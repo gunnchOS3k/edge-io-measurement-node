@@ -1,21 +1,29 @@
 package org.gunnchos.edgeio
 
-/**
- * Minimal Edge-IO Android client scaffold.
- *
- * Functional requirements covered by this scaffold + companion ViewModel:
- * - plain-language collection summary
- * - affirmative opt-in before collection
- * - non-identifying consent receipt
- * - start/stop, elapsed time, export, delete, withdrawal
- * - no direct identifier collection
- *
- * Full Compose UI wiring is intentional and compact for Gate 2.
- */
 data class ConsentState(
     val summaryAcknowledged: Boolean = false,
     val status: String = "pending", // pending|active|withdrawn
     val receiptId: String? = null,
+    val capturedAtIso: String? = null,
+)
+
+data class MetricSample(
+    val timestampIso: String,
+    val latencyMs: Double?,
+    val jitterMs: Double?,
+    val packetLossPct: Double?,
+    val uploadMbps: Double?,
+    val downloadMbps: Double?,
+    val networkType: String,
+    val cpuPct: Double?,
+    val memoryPct: Double?,
+    val batteryPct: Double?,
+    val charging: Boolean?,
+    val thermalState: String,
+    val localEdgeResponseMs: Double?,
+    val signalDbm: Double?,
+    val qualityFlags: List<String>,
+    val unavailable: Map<String, String> = emptyMap(),
 )
 
 data class SessionState(
@@ -23,5 +31,12 @@ data class SessionState(
     val siteId: String,
     val profile: String,
     val startedAtEpochMs: Long? = null,
-    val samples: List<Map<String, Any>> = emptyList(),
+    val endedAtEpochMs: Long? = null,
+    val plannedDurationSeconds: Double = 60.0,
+    val samples: List<MetricSample> = emptyList(),
+    val calibrationOnly: Boolean = false,
+    /** Consent frozen at session start so later withdrawal cannot rewrite collection evidence. */
+    val consentStatusAtStart: String? = null,
+    val consentReceiptIdAtStart: String? = null,
+    val consentCapturedAtIsoAtStart: String? = null,
 )
