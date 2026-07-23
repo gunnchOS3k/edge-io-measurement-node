@@ -1,0 +1,220 @@
+.....                                                                    [100%]
+5 passed in 0.05s
+{
+  "n_samples": 5,
+  "samples": [
+    {
+      "device_id_hash": "hash_0000",
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "consent_state": "opt_in_active",
+      "latency_ms": 12.0,
+      "jitter_ms": 1.5,
+      "packet_loss_percent": 0.1,
+      "rssi_dbm": null,
+      "cpu_percent": 22.0,
+      "memory_percent": 41.0,
+      "battery_percent": null,
+      "local_inference_ms": null,
+      "privacy_tier": "synthetic_tier_a",
+      "retention_policy": "delete_after_export_toy",
+      "opt_in": true
+    },
+    {
+      "device_id_hash": "hash_0001",
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "consent_state": "opt_in_active",
+      "latency_ms": 12.0,
+      "jitter_ms": 1.5,
+      "packet_loss_percent": 0.1,
+      "rssi_dbm": null,
+      "cpu_percent": 22.0,
+      "memory_percent": 41.0,
+      "battery_percent": null,
+      "local_inference_ms": null,
+      "privacy_tier": "synthetic_tier_a",
+      "retention_policy": "delete_after_export_toy",
+      "opt_in": true
+    },
+    {
+      "device_id_hash": "hash_0002",
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "consent_state": "opt_in_active",
+      "latency_ms": 12.0,
+      "jitter_ms": 1.5,
+      "packet_loss_percent": 0.1,
+      "rssi_dbm": null,
+      "cpu_percent": 22.0,
+      "memory_percent": 41.0,
+      "battery_percent": null,
+      "local_inference_ms": null,
+      "privacy_tier": "synthetic_tier_a",
+      "retention_policy": "delete_after_export_toy",
+      "opt_in": true
+    },
+    {
+      "device_id_hash": "hash_0003",
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "consent_state": "opt_in_active",
+      "latency_ms": 12.0,
+      "jitter_ms": 1.5,
+      "packet_loss_percent": 0.1,
+      "rssi_dbm": null,
+      "cpu_percent": 22.0,
+      "memory_percent": 41.0,
+      "battery_percent": null,
+      "local_inference_ms": null,
+      "privacy_tier": "synthetic_tier_a",
+      "retention_policy": "delete_after_export_toy",
+      "opt_in": true
+    },
+    {
+      "device_id_hash": "hash_0004",
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "consent_state": "opt_in_active",
+      "latency_ms": 12.0,
+      "jitter_ms": 1.5,
+      "packet_loss_percent": 0.1,
+      "rssi_dbm": null,
+      "cpu_percent": 22.0,
+      "memory_percent": 41.0,
+      "battery_percent": null,
+      "local_inference_ms": null,
+      "privacy_tier": "synthetic_tier_a",
+      "retention_policy": "delete_after_export_toy",
+      "opt_in": true
+    }
+  ],
+  "sanitized": [
+    {
+      "cpu_percent": 22.0,
+      "privacy_tier": "synthetic_tier_a",
+      "consent_state": "opt_in_active",
+      "packet_loss_percent": 0.1,
+      "memory_percent": 41.0,
+      "jitter_ms": 1.5,
+      "latency_ms": 12.0,
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "device_id_hash": "hash_0000"
+    },
+    {
+      "cpu_percent": 22.0,
+      "privacy_tier": "synthetic_tier_a",
+      "consent_state": "opt_in_active",
+      "packet_loss_percent": 0.1,
+      "memory_percent": 41.0,
+      "jitter_ms": 1.5,
+      "latency_ms": 12.0,
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "device_id_hash": "hash_0001"
+    },
+    {
+      "cpu_percent": 22.0,
+      "privacy_tier": "synthetic_tier_a",
+      "consent_state": "opt_in_active",
+      "packet_loss_percent": 0.1,
+      "memory_percent": 41.0,
+      "jitter_ms": 1.5,
+      "latency_ms": 12.0,
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "device_id_hash": "hash_0002"
+    },
+    {
+      "cpu_percent": 22.0,
+      "privacy_tier": "synthetic_tier_a",
+      "consent_state": "opt_in_active",
+      "packet_loss_percent": 0.1,
+      "memory_percent": 41.0,
+      "jitter_ms": 1.5,
+      "latency_ms": 12.0,
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "device_id_hash": "hash_0003"
+    },
+    {
+      "cpu_percent": 22.0,
+      "privacy_tier": "synthetic_tier_a",
+      "consent_state": "opt_in_active",
+      "packet_loss_percent": 0.1,
+      "memory_percent": 41.0,
+      "jitter_ms": 1.5,
+      "latency_ms": 12.0,
+      "timestamp_iso": "2026-01-01T12:00:00Z",
+      "device_id_hash": "hash_0004"
+    }
+  ],
+  "exports": [
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0000"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0001"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0002"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0003"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0004"
+      }
+    }
+  ],
+  "consent_status": "opt_in_active",
+  "anonymization": "hash_only_no_pii",
+  "note": "synthetic opt-in telemetry"
+}
+Wrote results/e2e
