@@ -1,0 +1,9 @@
+{
+  "name": "valid_rehearsal",
+  "assignment_id": "asn_9468def72bc740ed",
+  "expected_hash": "328e22605c90d85b5dfaa3249fc942079268660330ed897c131da28c98ed07e6",
+  "canonical_byte_count": 1056,
+  "canonical_sha256": "328e22605c90d85b5dfaa3249fc942079268660330ed897c131da28c98ed07e6",
+  "expected_valid": true,
+  "algorithm": "gunnchos-canonical-json-sha256-v1"
+}
