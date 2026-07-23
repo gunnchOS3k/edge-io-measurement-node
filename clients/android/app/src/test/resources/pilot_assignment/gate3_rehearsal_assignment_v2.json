@@ -1,0 +1,30 @@
+{
+  "schema_name": "gunnchos.pilot_assignment",
+  "schema_version": "1.0.0",
+  "assignment_id": "asn_33c87f5e180c45ad",
+  "matrix_cell_id": "rehearsal_zone_rehearsal_wifi_normal_learn",
+  "protocol_version": "gate3-pilot-v1",
+  "collection_day_id": "rehearsal_day",
+  "named_test_zone": "zone_rehearsal",
+  "location_category": "home_or_private_indoor",
+  "indoor_outdoor": "indoor",
+  "stationary_or_moving": "stationary",
+  "network_condition": "wifi_normal",
+  "expected_network_transport": "wifi",
+  "workload_profile": "learn",
+  "planned_duration_seconds": 300,
+  "session_mode": "PILOT_REHEARSAL",
+  "calibration_only": false,
+  "rehearsal_only": true,
+  "environmental_note_prompt": "Optional notes only. Do not enter street addresses, names, emails, phone numbers, SSIDs, or other identifiers. Max 280 characters.",
+  "created_at": "2026-07-23T23:11:21Z",
+  "expires_at": "2026-07-24T23:11:21Z",
+  "expiry_policy": "expires_24h_after_emit",
+  "site_id": "gary",
+  "assignment_hash_algorithm": "gunnchos-canonical-json-sha256-v1",
+  "producer": {
+    "repository": "gunnchos-7gc-ai-ran-field-kit",
+    "commit": "ffb237fb29a77f68fe2185b6d72de33edc076748"
+  },
+  "assignment_hash": "30adbabcd1a059d0d4362c31da2030259d8943fcefa4c27dbd80ba44b35f48b2"
+}

@@ -14,17 +14,31 @@ object SessionExporter {
         return fmt.format(Date(ms))
     }
 
+    fun resolveProtocolDeviation(session: SessionState): String? {
+        if (session.protocolDeviation != null) return session.protocolDeviation
+        return when {
+            session.sessionMode == SessionMode.CALIBRATION || session.calibrationOnly ->
+                "calibration_not_pilot"
+            session.sessionMode == SessionMode.PILOT_REHEARSAL || session.rehearsalOnly ->
+                "rehearsal_not_pilot"
+            !session.transportCompatible ->
+                "network_condition_mismatch"
+            else -> null
+        }
+    }
+
     fun toJson(
         session: SessionState,
         consent: ConsentManager,
         physical: Boolean,
-        zone: String,
-        networkCondition: String,
-        locationCategory: String = "home_or_private_indoor",
+        zone: String = session.namedTestZone,
+        networkCondition: String = session.networkCondition,
+        locationCategory: String = session.locationCategory,
         deviceCategory: String = "phone",
         modelLabel: String = "pixel_6a",
-        networkType: String = "wifi",
+        networkType: String = session.detectedNetworkTransport,
         producerCommit: String = BuildConfig.GIT_COMMIT,
+        buildDirty: Boolean = BuildConfig.GIT_DIRTY.equals("true", ignoreCase = true),
     ): String {
         require(physical) { "Production export path refuses synthetic collector substitution" }
         val evidence = "controlled_device_measurement"
@@ -41,6 +55,9 @@ object SessionExporter {
             ?: error("consent receipt required")
         val consentStatus = session.consentStatusAtStart
             ?: consent.state.status
+        val protocolDeviation = resolveProtocolDeviation(session)
+        val detectedTransport = session.detectedNetworkTransport.ifBlank { networkType }
+        val declaredCondition = session.declaredNetworkCondition.ifBlank { networkCondition }
 
         val measurements = JSONArray()
         for (s in session.samples) {
@@ -101,7 +118,7 @@ object SessionExporter {
                 .put("device_class", deviceCategory)
                 .put("os_family", "android")
                 .put("model_label", modelLabel)
-                .put("network_interfaces", JSONArray().put(networkType)),
+                .put("network_interfaces", JSONArray().put(detectedTransport)),
         )
         batch.put(
             "workload",
@@ -117,6 +134,7 @@ object SessionExporter {
                 .put("collector", "android_client")
                 .put("generated_at", isoFromEpoch(endMs))
                 .put("source", "PhysicalMetricsSampler")
+                .put("build_dirty", buildDirty)
                 .put(
                     "notes",
                     "Physical Android collection; unavailable radio throughput fields are explicit, not zero-filled",
@@ -127,19 +145,30 @@ object SessionExporter {
         val operatorNotes = buildString {
             append("model_label=$modelLabel")
             if (session.calibrationOnly) append("; calibration_only=true; not counted toward 54-session pilot")
+            if (session.rehearsalOnly) append("; rehearsal_only=true; not counted toward 54-session pilot")
         }
         val context = JSONObject()
         context.put("schema_name", "gunnchos.measurement_session_context")
         context.put("schema_version", "1.0.0")
         context.put("session_id", "android_${session.runId}")
         context.put("run_id", session.runId)
-        context.put("collection_day_id", if (session.calibrationOnly) "calibration_day" else "day_unassigned")
-        context.put("location_category", locationCategory)
-        context.put("named_test_zone", zone)
-        context.put("indoor_outdoor", "indoor")
-        context.put("stationary_or_moving", "stationary")
-        context.put("network_condition", networkCondition)
-        context.put("network_type", networkType)
+        context.put("collection_day_id", session.collectionDayId)
+        context.put("location_category", locationCategory.ifBlank { session.locationCategory })
+        context.put("named_test_zone", zone.ifBlank { session.namedTestZone })
+        context.put("indoor_outdoor", session.indoorOutdoor)
+        context.put("stationary_or_moving", session.stationaryOrMoving)
+        context.put("network_condition", declaredCondition)
+        context.put("declared_network_condition", declaredCondition)
+        context.put("detected_network_transport", detectedTransport)
+        context.put("network_type", detectedTransport)
+        context.put("session_mode", session.sessionMode.name)
+        context.put("calibration_only", session.calibrationOnly)
+        context.put("rehearsal_only", session.rehearsalOnly)
+        putOptionalString(context, "assignment_id", session.assignmentId)
+        putOptionalString(context, "assignment_hash", session.assignmentHash)
+        putOptionalString(context, "matrix_cell_id", session.matrixCellId)
+        putOptionalString(context, "protocol_version", session.protocolVersion)
+        context.put("transport_assignment_compatible", session.transportCompatible)
         context.put("workload_profile", session.profile)
         context.put("planned_duration_seconds", session.plannedDurationSeconds)
         context.put("actual_duration_seconds", actualDuration)
@@ -149,15 +178,16 @@ object SessionExporter {
         context.put("collector_version", BuildConfig.VERSION_NAME)
         context.put("consent_receipt_id", receipt)
         context.put("consent_captured_at", consentAt)
-        context.put("collection_purpose_version", "gate3-pilot-v1")
+        context.put("collection_purpose_version", BuildConfig.ASSIGNMENT_PROTOCOL_VERSION)
         context.put("privacy_policy_version", "gate3-privacy-v1")
-        context.put("environmental_notes", "")
+        context.put("environmental_notes", session.environmentalNotes.take(280))
         context.put("degradation_method", "none")
         context.put("operator_notes", operatorNotes)
-        context.put(
-            "protocol_deviation",
-            if (session.calibrationOnly) "calibration_not_pilot" else JSONObject.NULL,
-        )
+        if (protocolDeviation == null) {
+            context.put("protocol_deviation", JSONObject.NULL)
+        } else {
+            context.put("protocol_deviation", protocolDeviation)
+        }
         context.put("evidence_level", evidence)
 
         val root = JSONObject()
@@ -169,5 +199,13 @@ object SessionExporter {
 
     private fun putNullable(obj: JSONObject, key: String, value: Double?) {
         if (value == null) obj.put(key, JSONObject.NULL) else obj.put(key, value)
+    }
+
+    private fun putOptionalString(obj: JSONObject, key: String, value: String?) {
+        if (value.isNullOrBlank()) {
+            obj.put(key, JSONObject.NULL)
+        } else {
+            obj.put(key, value)
+        }
     }
 }

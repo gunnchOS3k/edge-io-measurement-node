@@ -1,4 +1,8 @@
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 plugins {
     id("com.android.application")
@@ -22,6 +26,30 @@ fun gitCommitSha(): String {
     }
 }
 
+fun gitDirtyFlag(): String {
+    return try {
+        val repoRoot = rootProject.projectDir.resolve("../..").canonicalFile
+        val proc = ProcessBuilder("git", "status", "--porcelain")
+            .directory(repoRoot)
+            .redirectErrorStream(true)
+            .start()
+        val out = ByteArrayOutputStream()
+        proc.inputStream.copyTo(out)
+        val code = proc.waitFor()
+        if (code != 0) return "true"
+        val dirty = out.toString(Charsets.UTF_8).trim().isNotEmpty()
+        if (dirty) "true" else "false"
+    } catch (_: Exception) {
+        "true"
+    }
+}
+
+fun buildTimestampIso(): String {
+    val fmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+    fmt.timeZone = TimeZone.getTimeZone("UTC")
+    return fmt.format(Date())
+}
+
 android {
     namespace = "org.gunnchos.edgeio"
     compileSdk = 34
@@ -30,10 +58,13 @@ android {
         applicationId = "org.gunnchos.edgeio"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.3.2-gate3-android"
+        versionCode = 7
+        versionName = "0.4.1-gate3-pilot"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GIT_COMMIT", "\"${gitCommitSha()}\"")
+        buildConfigField("String", "GIT_DIRTY", "\"${gitDirtyFlag()}\"")
+        buildConfigField("String", "BUILD_TIMESTAMP", "\"${buildTimestampIso()}\"")
+        buildConfigField("String", "ASSIGNMENT_PROTOCOL_VERSION", "\"gate3-pilot-v1\"")
         buildConfigField("String", "FILE_PROVIDER_AUTHORITY_SUFFIX", "\".provider\"")
     }
 

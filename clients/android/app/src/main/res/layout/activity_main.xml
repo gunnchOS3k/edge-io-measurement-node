@@ -7,21 +7,189 @@
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView android:id="@+id/modeLabel" android:textStyle="bold" android:textSize="20sp" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:id="@+id/summary" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <CheckBox android:id="@+id/ackSummary" android:text="I acknowledge the collection summary" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <CheckBox android:id="@+id/optIn" android:text="I affirmatively opt in" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <CheckBox android:id="@+id/calibrationOnly" android:text="Calibration only (not a pilot session)" android:checked="true" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Spinner android:id="@+id/profileSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Spinner android:id="@+id/zoneSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Spinner android:id="@+id/networkSpinner" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:id="@+id/timer" android:text="00:00 / 01:00" android:textSize="24sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:id="@+id/receipt" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/startBtn" android:text="Start 60s calibration" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/stopBtn" android:text="Stop" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/exportBtn" android:text="Export session" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/deleteBtn" android:text="Delete session" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <Button android:id="@+id/withdrawBtn" android:text="Withdraw consent" android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <TextView android:id="@+id/status" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/modeLabel"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/countingBanner"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:text="Select a session mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/buildIdentity"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/summary"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/ackSummary"
+            android:text="I acknowledge the collection summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/optIn"
+            android:text="I affirmatively opt in"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:text="Session mode"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/sessionModeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/importAssignmentBtn"
+            android:text="Import Assignment"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/assignmentStatus"
+            android:layout_marginTop="4dp"
+            android:text="Assignment: none"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/consentStatus"
+            android:text="Consent: pending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:text="Session details"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/sessionDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:text="Workload profile"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/profileSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:text="Named test zone"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/zoneSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:text="Network condition"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/networkSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:text="Environmental notes"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/environmentalNotes"
+            android:hint="Do not enter street addresses, names, emails, phone numbers, SSIDs, or other identifiers. Max 280 characters."
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:maxLines="4"
+            android:maxLength="280"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/documentDeviation"
+            android:text="Document transport mismatch as protocol deviation (network_condition_mismatch)"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:text="00:00 / 01:00"
+            android:textSize="24sp"
+            android:layout_marginTop="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/receipt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/startBtn"
+            android:text="START 60S CALIBRATION"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/stopBtn"
+            android:text="Stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/exportBtn"
+            android:text="Export session"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/deleteBtn"
+            android:text="Delete session"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/withdrawBtn"
+            android:text="Withdraw consent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

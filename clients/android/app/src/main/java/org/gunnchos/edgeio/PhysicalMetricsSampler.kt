@@ -4,8 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.BatteryManager
 import java.net.HttpURLConnection
 import java.net.URL
@@ -84,15 +82,8 @@ class PhysicalMetricsSampler(private val context: Context) {
     }
 
     private fun activeNetworkType(): String? {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = cm.activeNetwork ?: return null
-        val caps = cm.getNetworkCapabilities(network) ?: return null
-        return when {
-            caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "wifi"
-            caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "cellular"
-            caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "ethernet"
-            else -> "unknown"
-        }
+        val detected = NetworkTransportDetector.detect(context)
+        return if (detected == "unavailable") null else detected
     }
 
     private fun probeLatencyMs(): Double? {
