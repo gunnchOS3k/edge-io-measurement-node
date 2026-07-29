@@ -1,0 +1,17 @@
+{
+  "template_id": "edge-io-consent-record-v1",
+  "consent_id": "REPLACE",
+  "session_id": "REPLACE",
+  "consent_version": "gates46-edge-io-v1",
+  "affirmative_opt_in": false,
+  "plain_language_summary_shown": false,
+  "guardian_path_required": false,
+  "guardian_path_completed": null,
+  "stop_export_delete_offered": true,
+  "participant_id_scheme": "P###-hash",
+  "deidentified": true,
+  "irb_claim": "NO_IRB_CLAIM",
+  "recorded_at": "REPLACE_ISO8601",
+  "status": "PENDING",
+  "notes": "Harness template only. Do not claim IRB approval from this file."
+}

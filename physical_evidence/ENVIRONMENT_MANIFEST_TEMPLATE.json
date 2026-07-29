@@ -1,0 +1,12 @@
+{
+  "template_id": "edge-io-environment-manifest-v1",
+  "environment_id": "REPLACE",
+  "location_category": "library_or_community_indoor|campus_indoor|campus_outdoor|lab",
+  "site_id": "gary|ghana|guyana|gaza|geelong|graham_land|germany|REPLACE",
+  "zone_id": "zone_a|zone_b|zone_c|REPLACE",
+  "indoor_outdoor": "indoor|outdoor",
+  "timezone": "America/Chicago",
+  "notes_public": "Non-identifying environment category only.",
+  "status": "PENDING",
+  "notes": "No precise GPS, street address, or third-party personal data."
+}

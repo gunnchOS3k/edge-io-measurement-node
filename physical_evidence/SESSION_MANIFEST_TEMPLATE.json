@@ -1,0 +1,20 @@
+{
+  "template_id": "edge-io-session-manifest-v1",
+  "session_id": "REPLACE",
+  "operator": "REPLACE",
+  "timezone": "America/Chicago",
+  "started_at": "REPLACE_ISO8601",
+  "ended_at": "REPLACE_ISO8601",
+  "device_manifest_path": "physical_evidence/DEVICE_MANIFEST_TEMPLATE.json",
+  "network_manifest_path": "physical_evidence/NETWORK_MANIFEST_TEMPLATE.json",
+  "environment_manifest_path": "physical_evidence/ENVIRONMENT_MANIFEST_TEMPLATE.json",
+  "calibration_record_path": "physical_evidence/CALIBRATION_RECORD_TEMPLATE.json",
+  "consent_record_path": "physical_evidence/CONSENT_RECORD_TEMPLATE.json",
+  "pilot_matrix_ref": "../gunnchos-7gc-ai-ran-field-kit/protocols/controlled_pilot_matrix.csv",
+  "pilot_matrix_cell_id": "REPLACE_or_null",
+  "pilot_matrix_design_cells": 54,
+  "workload_profile": "learn|create|sense",
+  "evidence_label": "CONTROLLED_DEVICE_MEASUREMENT",
+  "status": "PENDING",
+  "notes": "Fill only after a real controlled-device session. Synthetic dry-runs must use SYNTHETIC_EXPERIMENT / DRY_RUN."
+}

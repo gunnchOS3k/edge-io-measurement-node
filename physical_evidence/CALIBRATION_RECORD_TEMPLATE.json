@@ -1,0 +1,16 @@
+{
+  "template_id": "edge-io-calibration-record-v1",
+  "calibration_id": "REPLACE",
+  "session_id": "REPLACE",
+  "device_model": "REPLACE",
+  "collector": "android|laptop|emulator",
+  "clock_sync_method": "REPLACE",
+  "rssi_reference": "REPLACE_or_null",
+  "latency_probe_target": "REPLACE",
+  "probe_interval_seconds": 30,
+  "calibration_status": "not_run|passed|failed|not_applicable",
+  "recorded_at": "REPLACE_ISO8601",
+  "operator": "REPLACE",
+  "status": "PENDING",
+  "notes": "Required before promoting evidence_label beyond SYNTHETIC_EXPERIMENT."
+}

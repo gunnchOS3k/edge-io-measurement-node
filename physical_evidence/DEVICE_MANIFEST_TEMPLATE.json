@@ -1,0 +1,14 @@
+{
+  "template_id": "edge-io-device-manifest-v1",
+  "device_id": "REPLACE",
+  "model": "REPLACE",
+  "manufacturer": "REPLACE",
+  "os_name": "Android|Linux|other",
+  "os_version": "REPLACE",
+  "app_build": "REPLACE",
+  "collector_mode": "android|laptop|emulator",
+  "serial_hash": null,
+  "sensors_enabled": ["rssi", "latency", "jitter", "packet_loss"],
+  "status": "PENDING",
+  "notes": "No precise GPS or residential address. Prefer hashed device identifiers."
+}
