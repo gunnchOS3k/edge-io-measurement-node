@@ -1,0 +1,11 @@
+{
+  "template_id": "edge-io-network-manifest-v1",
+  "network_id": "REPLACE",
+  "network_type": "wifi|cellular|mixed",
+  "network_condition": "wifi_normal|wifi_degraded|cellular_normal|cellular_degraded",
+  "ssid_or_carrier_category": "REPLACE_non_identifying",
+  "intentional_degradation": false,
+  "degradation_method": null,
+  "status": "PENDING",
+  "notes": "Do not store residential SSIDs that identify a home. Use category labels."
+}

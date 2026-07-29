@@ -1,4 +1,4 @@
-.PHONY: setup lint test contract-test demo e2e clean
+.PHONY: setup lint test contract-test demo e2e clean gate6-dry-run
 
 PY := PYTHONPATH=src
 
@@ -56,3 +56,7 @@ android-test:
 
 android-export-check:
 	@echo "Export check requires a device session file; validate with field-kit scripts/validate_session.py"
+
+# Gate 6 harness only — synthetic dry-run; never claims physical field PASS
+gate6-dry-run:
+	python3 scripts/gate6_dry_run.py

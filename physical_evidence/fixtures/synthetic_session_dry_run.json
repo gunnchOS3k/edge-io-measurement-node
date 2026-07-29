@@ -1,0 +1,38 @@
+{
+  "evidence_id": "edge-io-dryrun-field-001",
+  "evidence_label": "SYNTHETIC_EXPERIMENT",
+  "domain": "field_pilot",
+  "mode": "DRY_RUN",
+  "status": "DRY_RUN_SYNTHETIC",
+  "captured_at": "2026-07-29T00:00:00Z",
+  "operator": "cursor-gate6-dry-run",
+  "repository": "edge-io-measurement-node",
+  "commit": "dryrun00",
+  "session_id": "SYNTHETIC_EXPERIMENT-dryrun-session-001",
+  "pilot_matrix_ref": "../gunnchos-7gc-ai-ran-field-kit/protocols/controlled_pilot_matrix.csv",
+  "pilot_matrix_design_cells": 54,
+  "pilot_matrix_cell_id": null,
+  "eligible_physical_sessions": 0,
+  "device_manifest": {
+    "device_id": "synthetic-device-001",
+    "model": "SYNTHETIC_EMULATOR",
+    "os_name": "Android",
+    "os_version": "emulator",
+    "collector_mode": "emulator"
+  },
+  "network_manifest": {
+    "network_type": "wifi",
+    "network_condition": "wifi_normal"
+  },
+  "environment_manifest": {
+    "location_category": "lab",
+    "site_id": "gary",
+    "zone_id": "zone_a"
+  },
+  "consent_status": "dry_run_synthetic",
+  "calibration_status": "not_applicable",
+  "artifacts": [
+    "physical_evidence/fixtures/synthetic_session_dry_run.json"
+  ],
+  "notes": "SYNTHETIC_EXPERIMENT / DRY_RUN only. Not physical evidence. 54-cell pilot design remains documented in sibling field-kit matrix; physical cells stay pending."
+}
