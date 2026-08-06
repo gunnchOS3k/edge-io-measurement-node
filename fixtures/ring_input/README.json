@@ -1,0 +1,5 @@
+{
+  "evidence_class": "SOFTWARE_SIMULATED",
+  "physical_ring_claimed": false,
+  "note": "Optional local fixture pointer; harness loads sibling hardware reference by default."
+}
