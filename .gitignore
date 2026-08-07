@@ -20,3 +20,9 @@ physical_evidence/GATE6_DRY_RUN_REPORT.json
 # Gate 1 runtime evidence outputs
 gate1/evidence/out/**
 !gate1/evidence/out/**/.gitkeep
+gate1_digital_fabrication/ring_firmware/build/out/.stamp_*
+gate1_digital_fabrication/ring_firmware/build/debug/
+gate1_digital_fabrication/ring_firmware/build/reldev/
+gate1_digital_fabrication/ring_firmware/build/*.o
+gate1_digital_fabrication/ring_firmware/build/*.elf
+!gate1_digital_fabrication/ring_firmware/build/out/
