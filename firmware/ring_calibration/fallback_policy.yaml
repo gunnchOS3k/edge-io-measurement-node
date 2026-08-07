@@ -1,0 +1,3 @@
+modes: [none, gesture_disabled, host_controls]
+drift_threshold_mag: 2.5
+physical_status: PHYSICAL_PENDING
