@@ -18,9 +18,16 @@ def main() -> int:
         "ring_firmware_*.map",
         "slot0_image_signed_dev.bin",
         "MCUBOOT_SIGN_REPORT.json",
+        "MCUBOOT_PIPELINE_REPORT.json",
+        "ZEPHYR_WEST_PROBE.json",
+        "STATIC_ANALYSIS_REPORT.json",
         "STATUS.json",
     ):
         names.extend(sorted(OUT.glob(pat)))
+    pipe = OUT / "mcuboot_pipeline"
+    if pipe.is_dir():
+        names.extend(sorted(pipe.glob("*.bin")))
+        names.extend(sorted(pipe.glob("*.json")))
     for extra in ("VERSION.txt", "ring_firmware_dev_host.elf"):
         p = OUT / extra
         if p.exists():

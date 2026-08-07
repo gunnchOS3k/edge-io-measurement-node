@@ -1,0 +1,33 @@
+{
+  "negatives": [
+    {
+      "name": "tampered_update",
+      "expect": "VERIFY_FAIL",
+      "verified": false,
+      "ok": true
+    },
+    {
+      "name": "anti_replay_reject_counter_1",
+      "expect": "REPLAY_REJECT",
+      "verified": true,
+      "replay_accepted": false,
+      "ok": true
+    },
+    {
+      "name": "truncated_update",
+      "expect": "VERIFY_FAIL",
+      "verified": false,
+      "ok": true
+    }
+  ],
+  "swap_state": {
+    "active_slot": "slot0",
+    "pending": null,
+    "confirmed": true,
+    "anti_replay_seen": [
+      1,
+      2,
+      3
+    ]
+  }
+}

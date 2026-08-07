@@ -26,3 +26,4 @@ gate1_digital_fabrication/ring_firmware/build/reldev/
 gate1_digital_fabrication/ring_firmware/build/*.o
 gate1_digital_fabrication/ring_firmware/build/*.elf
 !gate1_digital_fabrication/ring_firmware/build/out/
+gate1_digital_fabrication/ring_firmware/.toolchain/
