@@ -1,0 +1,5 @@
+0x00000000      8 startup_arm.o:.isr_vector
+0x00000008     34 startup_arm.o:.text
+0x0000002C    914 ring_fw_arm.o:.text
+0x000003C0     18 ring_fw_arm.o:.rodata.str1.1
+TOTAL 978

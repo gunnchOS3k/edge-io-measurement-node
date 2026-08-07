@@ -1,0 +1,30 @@
+[
+  {
+    "name": "tampered_payload",
+    "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/tampered_payload.bin",
+    "expect": "VERIFY_FAIL",
+    "verified": false,
+    "ok": true
+  },
+  {
+    "name": "tampered_signature",
+    "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/tampered_signature.bin",
+    "expect": "VERIFY_FAIL",
+    "verified": false,
+    "ok": true
+  },
+  {
+    "name": "truncated_image",
+    "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/truncated_image.bin",
+    "expect": "VERIFY_FAIL",
+    "verified": false,
+    "ok": true
+  },
+  {
+    "name": "bad_magic",
+    "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/bad_magic.bin",
+    "expect": "VERIFY_FAIL",
+    "verified": false,
+    "ok": true
+  }
+]

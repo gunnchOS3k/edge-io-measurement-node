@@ -1,0 +1,44 @@
+# Edge I/O Ring EVT0 board (Zephyr-shaped, freestanding-compatible)
+# Target: Nordic nRF52840 — DEVELOPMENT artifacts only.
+# PHYSICAL_EXECUTION_FREEZE: no flash / no physical boot claim.
+
+board:
+  name: edge_io_ring
+  full_name: Edge I/O Ring EVT0
+  vendor: gunnchos
+  soc: nrf52840
+  arch: arm
+  toolchain:
+    - zephyr
+    - gnuarmemb
+    - clang-armv7em
+
+flash:
+  size_kb: 1024
+  base: 0x00000000
+ram:
+  size_kb: 256
+  base: 0x20000000
+
+# MCUboot slot layout (DEVELOPMENT)
+partitions:
+  mcuboot:
+    address: 0x00000000
+    size: 0x0000C000
+  image_0:
+    address: 0x0000C000
+    size: 0x0006E000
+  image_1:
+    address: 0x0007A000
+    size: 0x0006E000
+  scratch:
+    address: 0x000E8000
+    size: 0x00010000
+
+pinout_assumptions:
+  i2c0_sda: P0.26
+  i2c0_scl: P0.27
+  imu_int: P0.11
+  chg_status: P0.02
+  swd: dedicated
+  physical_boot: PENDING

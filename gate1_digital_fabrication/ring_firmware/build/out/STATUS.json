@@ -1,0 +1,35 @@
+{
+  "generated_at_utc": "2026-08-07T23:12:14Z",
+  "board": "edge_io_ring_evt0",
+  "mcu": "nRF52840",
+  "label": "development",
+  "tokens": [
+    "RING_MCU_TARGET_FIRMWARE_BUILD_PASS",
+    "RING_PHYSICAL_BOOT_PENDING"
+  ],
+  "physical_boot_claimed": false,
+  "missing_artifacts": [],
+  "toolchain": "clang -target armv7em-none-eabi freestanding (Zephyr-shaped board/DT)",
+  "mcuboot": "DEVELOPMENT HMAC signing + tampered negative fixtures",
+  "sha256sums": [
+    "8375615e57b2d18087af8772ee3e4de29257c8a03ed3d0a7c2f5b8eb8f7841da  ring_firmware_debug.elf",
+    "6a72487feac135db7f78e89fcee40863b55021d71aeb305845fc759b2db15223  ring_firmware_dev.elf",
+    "b732d154250f21c2dc6b6fb044b232b6bf9703fb179234882321445f6b2e367b  ring_firmware_dev_host.elf",
+    "6a72487feac135db7f78e89fcee40863b55021d71aeb305845fc759b2db15223  ring_firmware_release_development.elf",
+    "eff7373f2b6b07d02899022065c0969c5e29f101cc8d4478bfe8c8739af8e86e  ring_firmware_debug.bin",
+    "5f7fa0ec147065ee067d8dc18ee48e02edbc09818f66904e190cd9610a8feb54  ring_firmware_dev.bin",
+    "677a60e4e06bb779bf8964bd4c5e2d2cdd50885f2a4e0277ab855f5c37205272  ring_firmware_dev_TAMPERED.bin",
+    "ee65171a71a671931de2cb2cd7d0403abdb42cbdecc91c21d9818a6ddad5a7ee  ring_firmware_mcuboot_signed_dev.bin",
+    "5f7fa0ec147065ee067d8dc18ee48e02edbc09818f66904e190cd9610a8feb54  ring_firmware_release_development.bin",
+    "ef33650a8b33a9a8f7446f6e46be704e6c208743e98937920ded7da0c08a23a2  ring_firmware_debug.hex",
+    "6a29eb5dceb202b371a9689c318d5ef0672d6224ca69f42a5d0f9d9df0093f98  ring_firmware_dev.hex",
+    "6a29eb5dceb202b371a9689c318d5ef0672d6224ca69f42a5d0f9d9df0093f98  ring_firmware_release_development.hex",
+    "7e994cde28f894a2451b04b10a341ac9d0c20a9e8c69b3f2a71c9a26c447f5d8  ring_firmware_debug.map",
+    "dd57c8a32d0f0037967b79f962fa07f93cad4c811f9ccf0395490c8d4d0db9f7  ring_firmware_dev.map",
+    "dd57c8a32d0f0037967b79f962fa07f93cad4c811f9ccf0395490c8d4d0db9f7  ring_firmware_release_development.map",
+    "ee65171a71a671931de2cb2cd7d0403abdb42cbdecc91c21d9818a6ddad5a7ee  slot0_image_signed_dev.bin",
+    "3baf7a08f32ea6392d3fbe531a0449781bd089cb0bb67cf2b800e535e8e1bdcb  MCUBOOT_SIGN_REPORT.json",
+    "eace53f1fb0743f95af80eb73ddf512a592121235d021143dc63cc837a88003b  STATUS.json",
+    "99292f98ff8581ea4dc8b0ccf3dcaf4688b29bc2a94f43064e5c29be61a665da  VERSION.txt"
+  ]
+}

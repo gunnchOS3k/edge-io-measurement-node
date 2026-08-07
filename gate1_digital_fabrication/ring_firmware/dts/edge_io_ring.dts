@@ -1,0 +1,132 @@
+/*
+ * Device tree source (Zephyr-shaped) for Edge I/O Ring EVT0.
+ * Matches gate1_digital_fabrication schematic pinout assumptions.
+ * Not a claim of Zephyr west build success without SDK; freestanding ARM path is primary.
+ */
+
+/dts-v1/;
+
+/ {
+	model = "gunnchos Edge I/O Ring EVT0";
+	compatible = "gunnchos,edge-io-ring";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,console = &uart0;
+	};
+
+	aliases {
+		imu = &bmi270;
+		haptic = &drv2605l;
+		watchdog0 = &wdt0;
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-m4f";
+			reg = <0>;
+		};
+	};
+
+	soc {
+		compatible = "nordic,nRF52840-QIAA", "nordic,nRF52840", "nordic,nRF52", "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		flash-controller@4001e000 {
+			compatible = "nordic,nrf52-flash-controller";
+			reg = <0x4001e000 0x1000>;
+			flash0: flash@0 {
+				compatible = "soc-nv-flash";
+				reg = <0x00000000 0x100000>;
+				erase-block-size = <4096>;
+				write-block-size = <4>;
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					boot_partition: partition@0 {
+						label = "mcuboot";
+						reg = <0x00000000 0x0000C000>;
+					};
+					slot0_partition: partition@c000 {
+						label = "image-0";
+						reg = <0x0000C000 0x0006E000>;
+					};
+					slot1_partition: partition@7a000 {
+						label = "image-1";
+						reg = <0x0007A000 0x0006E000>;
+					};
+					scratch_partition: partition@e8000 {
+						label = "image-scratch";
+						reg = <0x000E8000 0x00010000>;
+					};
+				};
+			};
+		};
+
+		sram0: memory@20000000 {
+			compatible = "mmio-sram";
+			reg = <0x20000000 0x40000>;
+		};
+
+		uart0: uart@40002000 {
+			compatible = "nordic,nrf-uarte";
+			reg = <0x40002000 0x1000>;
+			status = "disabled";
+		};
+
+		i2c0: i2c@40003000 {
+			compatible = "nordic,nrf-twi";
+			reg = <0x40003000 0x1000>;
+			status = "okay";
+			clock-frequency = <100000>;
+			pinctrl-0 = <&i2c0_default>;
+			bmi270: bmi270@68 {
+				compatible = "bosch,bmi270";
+				reg = <0x68>;
+				int-gpios = <&gpio0 11 0>; /* P0.11 IMU_INT */
+			};
+			drv2605l: drv2605l@5a {
+				compatible = "ti,drv2605l";
+				reg = <0x5a>;
+			};
+		};
+
+		gpio0: gpio@50000000 {
+			compatible = "nordic,nrf-gpio";
+			reg = <0x50000000 0x1000>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <32>;
+		};
+
+		wdt0: wdt@40010000 {
+			compatible = "nordic,nrf-wdt";
+			reg = <0x40010000 0x1000>;
+		};
+	};
+
+	/* Charge status input from BQ25100 CHG → P0.02 */
+	chg_status {
+		compatible = "gpio-keys";
+		chg_pin: chg_pin {
+			gpios = <&gpio0 2 0>;
+			label = "CHG_STATUS";
+		};
+	};
+
+	pinctrl {
+		compatible = "nordic,nrf-pinctrl";
+		i2c0_default: i2c0_default {
+			group1 {
+				psels = <0x1A>, <0x1B>; /* P0.26 SDA, P0.27 SCL (encoded) */
+			};
+		};
+	};
+};
