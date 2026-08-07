@@ -1,49 +1,116 @@
 {
-  "signed": "ring_firmware_mcuboot_signed_dev.bin",
-  "tampered": "ring_firmware_dev_TAMPERED.bin",
-  "verify_signed_ok": true,
-  "verify_tampered_ok": false,
-  "verify_positive": true,
+  "pipeline": "sign/update/revert/factory-test/anti-replay",
   "key_label": "DEVELOPMENT_ONLY",
   "key_class": "DEVELOPMENT",
   "physical_boot_claim": false,
   "physical_boot_claimed": false,
-  "tokens": [
-    "RING_MCU_TARGET_FIRMWARE_BUILD_PASS",
-    "RING_PHYSICAL_BOOT_PENDING"
-  ],
-  "status_tokens": [
-    "RING_MCU_TARGET_FIRMWARE_BUILD_PASS",
-    "RING_PHYSICAL_BOOT_PENDING"
-  ],
+  "verify_slot0": true,
+  "verify_update": true,
+  "verify_revert": true,
+  "verify_factory": true,
+  "anti_replay_ok": true,
+  "swap_state": {
+    "active_slot": "slot0",
+    "pending": null,
+    "confirmed": true,
+    "anti_replay_seen": [
+      1,
+      2,
+      3
+    ]
+  },
+  "artifacts": {
+    "slot0": "mcuboot_pipeline/slot0_signed_dev.bin",
+    "update": "mcuboot_pipeline/slot1_update_signed_dev.bin",
+    "revert": "mcuboot_pipeline/revert_signed_dev.bin",
+    "factory": "mcuboot_pipeline/factory_test_signed_dev.bin"
+  },
+  "headers": {
+    "slot0": {
+      "magic": "GCHMCU1",
+      "image_version": 1,
+      "anti_replay_counter": 1,
+      "image_kind": "slot0"
+    },
+    "update": {
+      "magic": "GCHMCU1",
+      "image_version": 2,
+      "anti_replay_counter": 2,
+      "image_kind": "update"
+    },
+    "revert": {
+      "magic": "GCHMCU1",
+      "image_version": 1,
+      "anti_replay_counter": 3,
+      "image_kind": "revert"
+    },
+    "factory": {
+      "magic": "GCHMCU1",
+      "image_version": 0,
+      "anti_replay_counter": 100,
+      "image_kind": "factory"
+    }
+  },
   "negative_fixtures": [
     {
+      "name": "tampered_update",
+      "expect": "VERIFY_FAIL",
+      "verified": false,
+      "ok": true
+    },
+    {
+      "name": "anti_replay_reject_counter_1",
+      "expect": "REPLAY_REJECT",
+      "verified": true,
+      "replay_accepted": false,
+      "ok": true
+    },
+    {
+      "name": "truncated_update",
+      "expect": "VERIFY_FAIL",
+      "verified": false,
+      "ok": true
+    }
+  ],
+  "classic_negatives": [
+    {
       "name": "tampered_payload",
-      "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/tampered_payload.bin",
       "expect": "VERIFY_FAIL",
       "verified": false,
       "ok": true
     },
     {
       "name": "tampered_signature",
-      "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/tampered_signature.bin",
       "expect": "VERIFY_FAIL",
       "verified": false,
       "ok": true
     },
     {
       "name": "truncated_image",
-      "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/truncated_image.bin",
       "expect": "VERIFY_FAIL",
       "verified": false,
       "ok": true
     },
     {
       "name": "bad_magic",
-      "path": "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/edge-io-measurement-node/gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/bad_magic.bin",
       "expect": "VERIFY_FAIL",
       "verified": false,
       "ok": true
     }
-  ]
+  ],
+  "tokens": [
+    "RING_MCUBOOT_DEV_PIPELINE_PASS",
+    "RING_MCU_TARGET_FIRMWARE_BUILD_PASS",
+    "RING_PHYSICAL_BOOT_PENDING"
+  ],
+  "status_tokens": [
+    "RING_MCUBOOT_DEV_PIPELINE_PASS",
+    "RING_MCU_TARGET_FIRMWARE_BUILD_PASS",
+    "RING_PHYSICAL_BOOT_PENDING"
+  ],
+  "signed": "ring_firmware_mcuboot_signed_dev.bin",
+  "tampered": "tampered_payload.bin",
+  "verify_signed_ok": true,
+  "verify_tampered_ok": false,
+  "verify_positive": true
 }

@@ -7,8 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _load_sign_mod():
-    path = ROOT / "scripts" / "mcuboot_dev_sign.py"
-    spec = importlib.util.spec_from_file_location("mcuboot_dev_sign", path)
+    path = ROOT / "scripts" / "mcuboot_dev_pipeline.py"
+    spec = importlib.util.spec_from_file_location("mcuboot_dev_pipeline", path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader
     spec.loader.exec_module(mod)
@@ -18,7 +18,6 @@ def _load_sign_mod():
 def test_negative_fixtures_fail_when_present():
     fixtures = ROOT / "mcuboot" / "fixtures" / "NEGATIVE_FIXTURES.json"
     if not fixtures.exists():
-        # Allow collection before make mcuboot; skip soft
         return
     data = json.loads(fixtures.read_text())
     assert data, "expected negative fixtures"
@@ -34,5 +33,6 @@ def test_sign_report_tokens_when_present():
     data = json.loads(report.read_text())
     assert data["physical_boot_claimed"] is False
     assert "RING_PHYSICAL_BOOT_PENDING" in data["tokens"]
+    assert "RING_MCUBOOT_DEV_PIPELINE_PASS" in data["tokens"]
     assert data["key_class"] == "DEVELOPMENT"
     assert data["verify_positive"] is True

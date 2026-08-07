@@ -1,0 +1,10 @@
+{
+  "active_slot": "slot0",
+  "pending": null,
+  "confirmed": true,
+  "anti_replay_seen": [
+    1,
+    2,
+    3
+  ]
+}

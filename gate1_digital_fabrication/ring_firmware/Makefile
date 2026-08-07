@@ -1,7 +1,7 @@
 # Edge I/O Ring — Zephyr-shaped nRF52840 freestanding firmware
 # Primary path: clang -target armv7em-none-eabi (reproducible without full Zephyr SDK)
-# Optional: west build when ZEPHYR_BASE is set (soft-skip otherwise)
-# Tokens: RING_MCU_TARGET_FIRMWARE_BUILD_PASS · RING_PHYSICAL_BOOT_PENDING
+# Optional: isolated west venv under .toolchain/; RING_ZEPHYR_WEST_BUILD_PASS only on real west build
+# Tokens: RING_MCU_TARGET_FIRMWARE_BUILD_PASS · RING_MCUBOOT_DEV_PIPELINE_PASS · RING_PHYSICAL_BOOT_PENDING
 # PHYSICAL_EXECUTION_FREEZE: no physical boot claim.
 
 CLANG ?= clang
@@ -11,9 +11,9 @@ CFLAGS_ARM_COMMON = -target armv7em-none-eabi -ffreestanding -nostdlib -Wall -Ii
 CFLAGS_ARM_DEBUG = $(CFLAGS_ARM_COMMON) -O0 -g -DRING_BUILD_DEBUG=1
 CFLAGS_ARM_RELDEV = $(CFLAGS_ARM_COMMON) -Os -DNDEBUG -DRING_BUILD_RELEASE_DEVELOPMENT=1
 
-.PHONY: all test host sha artifacts host-sim native-sim mcuboot clean zephyr-soft debug release-development status size-report zephyr-board-check
+.PHONY: all test host sha artifacts host-sim native-sim mcuboot mcuboot-sign clean zephyr-soft zephyr-west-setup zephyr-west-probe debug release-development status size-report zephyr-board-check static-analysis
 
-all: artifacts test host-sim native-sim mcuboot size-report zephyr-board-check zephyr-soft status
+all: artifacts test host-sim native-sim mcuboot static-analysis size-report zephyr-board-check zephyr-west-setup zephyr-west-probe zephyr-soft status
 
 build/ring_fw_host.o: src/ring_fw.c include/ring_fw.h
 	@mkdir -p build
@@ -65,7 +65,7 @@ artifacts: build/ring_fw_host.elf debug release-development
 test: build/test_ring_fw.elf build/ring_fw_host.elf
 	./build/test_ring_fw.elf
 	./build/ring_fw_host.elf
-	$(PY) -m pytest -q tests/test_protocol_host.py tests/test_pinout_board.py tests/test_mcuboot_fixtures.py
+	$(PY) -m pytest -q tests/test_protocol_host.py tests/test_pinout_board.py tests/test_mcuboot_fixtures.py tests/test_mcuboot_pipeline.py tests/test_ble_stub.py
 
 host: build/ring_fw_host.elf
 	./build/ring_fw_host.elf
@@ -77,12 +77,25 @@ native-sim:
 	$(PY) native_sim/native_sim_boot.py --self-check
 
 mcuboot: artifacts
-	$(PY) scripts/mcuboot_dev_sign.py
+	$(PY) scripts/mcuboot_dev_pipeline.py
 	$(PY) scripts/write_sha256sums.py
 
-zephyr-soft:
-	@if [ -n "$${ZEPHYR_BASE:-}" ] && command -v west >/dev/null 2>&1; then \
-	  echo "ZEPHYR_WEST_PRESENT — soft path available (not required for Gate1 closeout)"; \
+mcuboot-sign: mcuboot
+
+static-analysis:
+	$(PY) scripts/static_analysis.py
+
+zephyr-west-setup:
+	@bash scripts/setup_zephyr_west_isolated.sh
+
+zephyr-west-probe:
+	@$(PY) scripts/zephyr_west_probe.py
+
+zephyr-soft: zephyr-west-probe
+	@if [ -n "$${ZEPHYR_BASE:-}" ] && [ -n "$${ZEPHYR_SDK_INSTALL_DIR:-}" ] && command -v west >/dev/null 2>&1; then \
+	  echo "ZEPHYR_WEST_ENV_PRESENT — west build still requires app integration; see docs/ZEPHYR_WEST_BLOCKER.md"; \
+	elif [ -x .toolchain/west-venv/bin/west ]; then \
+	  echo "WEST_ISOLATED_PRESENT; ZEPHYR_SDK_ABSENT soft-skip — freestanding ARM path authoritative"; \
 	else \
 	  echo "ZEPHYR_SDK_ABSENT soft-skip; freestanding ARM path is authoritative"; \
 	fi
@@ -90,6 +103,7 @@ zephyr-soft:
 zephyr-board-check:
 	@test -f boards/arm/edge_io_ring/board.yml
 	@test -f boards/edge_io_ring/edge_io_ring.dts -o -f dts/edge_io_ring.dts
+	@test -f dts/pinout.json
 	@echo ZEPHYR_BOARD_DEFINITION_PRESENT
 
 size-report: artifacts
@@ -100,6 +114,7 @@ size-report: artifacts
 
 status:
 	@$(PY) scripts/write_firmware_status.py
+	@$(PY) scripts/write_sha256sums.py
 
 sha: artifacts
 
