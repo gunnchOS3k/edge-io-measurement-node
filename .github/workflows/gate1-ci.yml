@@ -1,0 +1,86 @@
+name: Gate 1 post-merge integrity
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate1-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+
+      - name: Checkout ring protocol sibling
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-hardware-industrial-design
+          path: .deps/gunnchos-hardware-industrial-design
+          # Same-org GITHUB_TOKEN; fails loudly if inaccessible (do not weaken)
+
+      - name: Checkout field-kit sibling (canonical contracts)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-7gc-ai-ran-field-kit
+          path: .deps/gunnchos-7gc-ai-ran-field-kit
+          ref: main
+
+      - name: Link siblings for relative imports
+        run: |
+          set -euo pipefail
+          parent="$(dirname "$GITHUB_WORKSPACE")"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-hardware-industrial-design" "$parent/gunnchos-hardware-industrial-design"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-7gc-ai-ran-field-kit" "$parent/gunnchos-7gc-ai-ran-field-kit"
+          test -f "$parent/gunnchos-hardware-industrial-design/ring_input/python/authenticated_ring_input/__init__.py"
+          test -f "$parent/gunnchos-7gc-ai-ran-field-kit/scripts/validate_contract.py"
+          echo "Linked siblings under $parent"
+
+      - name: Fail on master as active base/default
+        run: |
+          set -euo pipefail
+          if grep -RInE --include='*.yml' --include='*.yaml' \
+            -e 'branches:[[:space:]]*\[[^]]*master' \
+            -e 'default[_-]branch:[[:space:]]*master' \
+            -e 'base:[[:space:]]*master' \
+            .github/workflows 2>/dev/null; then
+            echo "MAIN_BRANCH_POLICY_FAIL: active master default/base ref in workflows"
+            exit 1
+          fi
+          echo "MAIN_BRANCH_POLICY_OK"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Full pytest
+        run: PYTHONPATH=src pytest -q
+
+      - name: Ring harness + schema/contract validation
+        run: |
+          PYTHONPATH=src pytest -q tests/test_ring_input_harness.py tests/test_telemetry_schema.py tests/contracts
+
+      - name: Upload synthetic summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate1-edge-io-synthetic-summary
+          path: |
+            results/**/*.json
+          if-no-files-found: ignore
+          retention-days: 14
