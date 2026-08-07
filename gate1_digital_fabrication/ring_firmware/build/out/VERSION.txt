@@ -1,0 +1,3 @@
+0.1.0-dev
+label: development
+board: edge_io_ring_evt0
