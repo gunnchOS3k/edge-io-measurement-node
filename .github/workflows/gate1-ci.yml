@@ -33,13 +33,22 @@ jobs:
           path: .deps/gunnchos-hardware-industrial-design
           # Same-org GITHUB_TOKEN; fails loudly if inaccessible (do not weaken)
 
-      - name: Link sibling for relative imports
+      - name: Checkout field-kit sibling (canonical contracts)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-7gc-ai-ran-field-kit
+          path: .deps/gunnchos-7gc-ai-ran-field-kit
+          ref: main
+
+      - name: Link siblings for relative imports
         run: |
           set -euo pipefail
-          dest="$(dirname "$GITHUB_WORKSPACE")/gunnchos-hardware-industrial-design"
-          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-hardware-industrial-design" "$dest"
-          test -f "$dest/ring_input/python/authenticated_ring_input/__init__.py"
-          echo "Linked sibling at $dest"
+          parent="$(dirname "$GITHUB_WORKSPACE")"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-hardware-industrial-design" "$parent/gunnchos-hardware-industrial-design"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-7gc-ai-ran-field-kit" "$parent/gunnchos-7gc-ai-ran-field-kit"
+          test -f "$parent/gunnchos-hardware-industrial-design/ring_input/python/authenticated_ring_input/__init__.py"
+          test -f "$parent/gunnchos-7gc-ai-ran-field-kit/scripts/validate_contract.py"
+          echo "Linked siblings under $parent"
 
       - name: Fail on master as active base/default
         run: |
