@@ -23,6 +23,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Checkout ring protocol sibling
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-hardware-industrial-design
+          path: .deps/gunnchos-hardware-industrial-design
+          # Same-org GITHUB_TOKEN; fails loudly if inaccessible (do not weaken)
+      - name: Checkout field-kit sibling (canonical contracts)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-7gc-ai-ran-field-kit
+          path: .deps/gunnchos-7gc-ai-ran-field-kit
+          ref: main
+      - name: Link siblings for relative imports
+        run: |
+          set -euo pipefail
+          parent="$(dirname "$GITHUB_WORKSPACE")"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-hardware-industrial-design" "$parent/gunnchos-hardware-industrial-design"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-7gc-ai-ran-field-kit" "$parent/gunnchos-7gc-ai-ran-field-kit"
+          test -f "$parent/gunnchos-hardware-industrial-design/ring_input/python/authenticated_ring_input/__init__.py"
+          test -f "$parent/gunnchos-7gc-ai-ran-field-kit/scripts/validate_contract.py"
+          echo "Linked siblings under $parent"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
