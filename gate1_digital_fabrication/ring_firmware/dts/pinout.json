@@ -1,0 +1,17 @@
+{
+  "board": "edge_io_ring_evt0",
+  "mcu": "nRF52840",
+  "source": "gate1_digital_fabrication schematic netlist",
+  "gpio": {
+    "I2C_SDA": {"port": 0, "pin": 26, "label": "P0.26"},
+    "I2C_SCL": {"port": 0, "pin": 27, "label": "P0.27"},
+    "IMU_INT": {"port": 0, "pin": 11, "label": "P0.11"},
+    "CHG_STATUS": {"port": 0, "pin": 2, "label": "P0.02"}
+  },
+  "i2c_devices": {
+    "BMI270": "0x68",
+    "DRV2605L": "0x5A"
+  },
+  "dedicated": ["SWDIO", "SWDCLK", "nRESET"],
+  "physical_boot": "RING_PHYSICAL_BOOT_PENDING"
+}

@@ -1,0 +1,37 @@
+/dts-v1/;
+/ {
+  model = "gunnchOS Edge I/O Ring EVT0";
+  compatible = "gunnchos,edge-io-ring";
+  chosen {
+    zephyr,sram = &sram0;
+    zephyr,flash = &flash0;
+    zephyr,console = &uart0;
+  };
+  /* Pinout assumptions aligned to ring schematic EVT0 — digital only; physical verify pending */
+  /* Pinout from dts/pinout.json (schematic netlist) */
+  aliases {
+    imu-int = &imu_int;
+    chg-status = &chg_status;
+    imu-i2c = &i2c0;
+  };
+  gpio_inputs {
+    compatible = "gpio-keys";
+    imu_int: imu_int {
+      gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
+      label = "IMU_INT";
+    };
+    chg_status: chg_status {
+      gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+      label = "CHG_STATUS";
+    };
+  };
+};
+/* Reference nodes for documentation / future Zephyr west build */
+&gpio0 { status = "okay"; };
+&i2c0 {
+  status = "okay";
+  /* SDA P0.26 SCL P0.27 */
+  clock-frequency = <400000>;
+};
+&uart0 { status = "okay"; };
+&usbd { status = "okay"; };

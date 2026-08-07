@@ -1,0 +1,63 @@
+name: Gate1 ring firmware (ARM + MCUboot DEV)
+
+on:
+  pull_request:
+    paths:
+      - "gate1_digital_fabrication/ring_firmware/**"
+      - ".github/workflows/gate1-ring-firmware.yml"
+  push:
+    branches: [main]
+    paths:
+      - "gate1_digital_fabrication/ring_firmware/**"
+      - ".github/workflows/gate1-ring-firmware.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate1-ring-fw-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-sign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install clang + pytest
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm openssl
+          python -m pip install --upgrade pip
+          pip install pytest
+      - name: Soft-skip Zephyr SDK note
+        working-directory: gate1_digital_fabrication/ring_firmware
+        run: make zephyr-soft
+      - name: Build ARM artifacts + host/native tests + MCUboot DEV sign
+        working-directory: gate1_digital_fabrication/ring_firmware
+        run: make clean && make all
+      - name: Assert status tokens
+        working-directory: gate1_digital_fabrication/ring_firmware
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          st = json.loads(Path("build/out/STATUS.json").read_text())
+          assert "RING_MCU_TARGET_FIRMWARE_BUILD_PASS" in st["tokens"]
+          assert "RING_PHYSICAL_BOOT_PENDING" in st["tokens"]
+          assert st["physical_boot_claimed"] is False
+          print("TOKENS_OK", st["tokens"])
+          PY
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ring-firmware-artifacts
+          path: |
+            gate1_digital_fabrication/ring_firmware/build/out/
+            gate1_digital_fabrication/ring_firmware/docs/FIRMWARE_STATUS.md
+            gate1_digital_fabrication/docs/RING_FIRMWARE_STATUS.md
+            gate1_digital_fabrication/ring_firmware/mcuboot/fixtures/

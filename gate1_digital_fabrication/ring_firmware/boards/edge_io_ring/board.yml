@@ -1,0 +1,6 @@
+board:
+  name: edge_io_ring
+  full_name: Edge I/O Ring EVT0
+  vendor: gunnchos
+  socs:
+    - name: nrf52840
