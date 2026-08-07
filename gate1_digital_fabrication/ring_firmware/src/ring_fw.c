@@ -80,3 +80,42 @@ void ring_diag_emit(char *buf, size_t n) {
     RING_FW_VERSION_MAJOR, RING_FW_VERSION_MINOR, RING_FW_VERSION_PATCH,
     RING_FW_LABEL, batt_pct, cal_conf, low_power);
 }
+
+
+static int ble_state = 0; /* 0 discover .. 4 paired */
+static uint8_t ble_session[16];
+
+void ring_identity_set(ring_identity_t *id, const uint8_t device_id[16]) {
+  if (!id || !device_id) return;
+  memcpy(id->device_id, device_id, 16);
+}
+
+int ring_ble_pair_step(int cmd, const uint8_t *nonce16, uint8_t *resp16) {
+  if (cmd == 1 && ble_state == 0) { ble_state = 1; return 1; }
+  if (cmd == 2 && ble_state == 1 && nonce16 && resp16) {
+    for (int i=0;i<16;i++) resp16[i] = (uint8_t)(nonce16[i] ^ 0x5A);
+    ble_state = 2; return 2;
+  }
+  if (cmd == 3 && ble_state == 2) { ble_state = 3; return 3; }
+  if (cmd == 4 && ble_state == 3) {
+    for (int i=0;i<16;i++) ble_session[i] = (uint8_t)(0x10+i);
+    ble_state = 4; return 4;
+  }
+  if (ble_state == 4) return 4;
+  return -1;
+}
+
+int ring_ble_paired(void) { return ble_state == 4; }
+
+void ring_telemetry_emit(char *buf, size_t n) {
+  snprintf(buf, n, "{\"batt\":%u,\"paired\":%d,\"lp\":%d,\"label\":\"development\"}",
+           batt_pct, ble_state==4, low_power);
+}
+
+int ring_factory_selftest(void) {
+  uint8_t key[16]={1}; ring_auth_frame_t fr; ring_auth_mint(&fr,1,2,key);
+  if (!ring_auth_verify(&fr,1,key)) return -1;
+  uint8_t hdr[8]={'D','F','U','1',0,0,0,1};
+  if (ring_dfu_validate_header(hdr,8)!=0) return -2;
+  return 0;
+}

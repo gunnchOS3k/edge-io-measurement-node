@@ -1,47 +1,51 @@
-# Edge I/O Ring development firmware — DIGITAL / NONPHYSICAL
-# Label: development firmware (not production signed image)
+# Edge I/O Ring development firmware
 CLANG ?= clang
-TARGET = armv7em-none-unknown-eabi
-CFLAGS = -target $(TARGET) -ffreestanding -nostdlib -Os -Wall -Wextra -Iinclude -DRING_DEVELOPMENT=1
-SRCS = $(wildcard src/*.c)
-OBJS = $(patsubst src/%.c,build/%.o,$(SRCS))
-BUILD = build
-OUT = build/out
-PY = python3.11
+PY ?= python3.11
+CFLAGS_HOST = -O0 -g -Wall -Wextra -Iinclude -DRING_DEVELOPMENT=1
+CFLAGS_ARM = -target armv7em-none-unknown-eabi -ffreestanding -nostdlib -Os -Wall -Iinclude -DRING_FREESTANDING=1 -DRING_DEVELOPMENT=1
 
-.PHONY: all clean test host-sim artifacts
+.PHONY: all test host sha artifacts host-sim clean
 
-all: artifacts
+all: artifacts test host-sim
 
-build/%.o: src/%.c
+build/ring_fw_host.o: src/ring_fw.c include/ring_fw.h
 	@mkdir -p build
-	$(CLANG) $(CFLAGS) -c $< -o $@
+	$(CLANG) $(CFLAGS_HOST) -c src/ring_fw.c -o $@
 
-artifacts: $(OBJS)
-	@mkdir -p $(OUT)
-	$(PY) scripts/pack_arm_elf.py $(OBJS) $(OUT)
-	@echo "DEVELOPMENT FIRMWARE ARTIFACTS in $(OUT)"
-
-# Hosted unit-test compile (native) for logic modules without Reset loop
-HOST_SRCS = src/boot.c src/identity.c src/ble_pairing.c src/auth_anti_replay.c \
-	src/sensors.c src/fusion_filter.c src/gesture.c src/calibration.c \
-	src/battery.c src/low_power.c src/haptics.c src/dfu.c src/diagnostics.c \
-	src/telemetry.c src/factory_test.c
-HOST_OBJS = $(patsubst src/%.c,build/host_%.o,$(notdir $(HOST_SRCS)))
-
-build/host_%.o: src/%.c
+build/main_host.o: src/main.c include/ring_fw.h
 	@mkdir -p build
-	$(CLANG) -c -O0 -g -Iinclude -DRING_DEVELOPMENT=1 $< -o $@
+	$(CLANG) $(CFLAGS_HOST) -c src/main.c -o $@
 
-build/host_test_runner: tests/test_runner.c $(HOST_OBJS)
-	$(CLANG) -O0 -g -Iinclude -DRING_DEVELOPMENT=1 tests/test_runner.c $(HOST_OBJS) -o $@
+build/ring_fw_host.elf: build/ring_fw_host.o build/main_host.o
+	$(CLANG) $(CFLAGS_HOST) $^ -o $@
 
-test: build/host_test_runner
-	./build/host_test_runner
-	$(PY) -m pytest -q tests/test_protocol_host.py host_simulator
+build/test_ring_fw.elf: tests/test_ring_fw.c build/ring_fw_host.o
+	$(CLANG) $(CFLAGS_HOST) tests/test_ring_fw.c build/ring_fw_host.o -o $@
+
+artifacts: build/ring_fw_host.elf
+	@mkdir -p build/out
+	cp build/ring_fw_host.elf build/out/ring_firmware_dev_host.elf
+	$(CLANG) $(CFLAGS_ARM) -fno-builtin -c src/startup_arm.c -o build/startup_arm.o
+	$(CLANG) $(CFLAGS_ARM) -fno-builtin -c src/ring_fw_freestanding.c -o build/ring_fw_arm.o
+	$(PY) scripts/pack_arm_elf.py build/startup_arm.o build/ring_fw_arm.o build/out
+	@echo 0.1.0-dev > build/out/VERSION.txt
+	@echo label: development >> build/out/VERSION.txt
+	@echo board: edge_io_ring_evt0 >> build/out/VERSION.txt
+	cd build/out && shasum -a 256 ring_firmware_dev.elf ring_firmware_dev.bin ring_firmware_dev.hex ring_firmware_dev.map VERSION.txt ring_firmware_dev_host.elf > SHA256SUMS
+	@echo ARTIFACTS_OK
+
+test: build/test_ring_fw.elf build/ring_fw_host.elf
+	./build/test_ring_fw.elf
+	./build/ring_fw_host.elf
+	$(PY) -m pytest -q tests/test_protocol_host.py
+
+host: build/ring_fw_host.elf
+	./build/ring_fw_host.elf
 
 host-sim:
-	$(PY) host_simulator/ring_host_sim.py --self-check
+	$(PY) host_sim/ring_host_sim.py --self-check
+
+sha: artifacts
 
 clean:
 	rm -rf build
