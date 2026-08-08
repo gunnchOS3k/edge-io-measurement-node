@@ -1,0 +1,17 @@
+{
+  "generated_at_utc": "2026-08-08T00:29:06Z",
+  "token": "RING_ZEPHYR_WEST_BUILD_PASS",
+  "physical_boot": "RING_PHYSICAL_BOOT_PENDING",
+  "zephyr_version": "3.7.1",
+  "sdk_version": "0.16.8",
+  "board": "nrf52840dk/nrf52840",
+  "west_version": "v1.5.0",
+  "cmake_version": "3.31.10",
+  "artifacts": {
+    "ring_zephyr_nrf52840.bin": "372e79093fa6d34b7e7f218c94cea878b37dd8df0f32c168b630ed4ed0aea363",
+    "ring_zephyr_nrf52840.elf": "5b87e5b27a6e5e96d37515239fee96229f4ff13f58bfca10f261b40797111ef7",
+    "ring_zephyr_nrf52840.hex": "16673f71dcc532bfeafaa47e3b1feac50ad90838602504513659ac4e81f8c2df"
+  },
+  "elf_path": "build/zephyr_west/zephyr/zephyr.elf",
+  "workspace": "/Users/gunnchos/zephyr-workspace"
+}
