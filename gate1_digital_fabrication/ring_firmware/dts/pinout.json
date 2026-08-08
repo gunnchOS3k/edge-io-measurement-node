@@ -1,17 +1,31 @@
 {
   "board": "edge_io_ring_evt0",
-  "mcu": "nRF52840",
-  "source": "gate1_digital_fabrication schematic netlist",
+  "mcu": "nRF52840-QIAA-R",
+  "source": "hardware device_designs/edge_io_rings BOM + schematic Values (Continuation V parity)",
+  "hardware_repo_parity_doc": "gunnchos-hardware-industrial-design/device_designs/edge_io_rings/docs/BOM_SCH_FW_PARITY.md",
   "gpio": {
-    "I2C_SDA": {"port": 0, "pin": 26, "label": "P0.26"},
-    "I2C_SCL": {"port": 0, "pin": 27, "label": "P0.27"},
-    "IMU_INT": {"port": 0, "pin": 11, "label": "P0.11"},
-    "CHG_STATUS": {"port": 0, "pin": 2, "label": "P0.02"}
+    "I2C_SDA": {"port": 0, "pin": 26, "label": "P0.26", "status": "PARITY"},
+    "I2C_SCL": {"port": 0, "pin": 27, "label": "P0.27", "status": "PARITY"},
+    "IMU_INT": {"port": 0, "pin": 11, "label": "P0.11", "status": "PARITY"},
+    "CHG_STATUS": {"port": 0, "pin": 2, "label": "P0.02", "status": "PARITY"},
+    "CAP_INT": {"port": 0, "pin": 15, "label": "P0.15", "status": "RESERVED_STUB", "device": "IQS7222A"},
+    "SE_IRQ": {"port": 0, "pin": 16, "label": "P0.16", "status": "RESERVED_STUB", "device": "SE050C1HQ1"},
+    "UWB_IRQ": {"port": 0, "pin": 17, "label": "P0.17", "status": "RESERVED_STUB_DNP", "device": "DWM3001C"},
+    "NPM_INT": {"port": 0, "pin": 3, "label": "P0.03", "status": "RESERVED_STUB", "device": "npm1300-CAAA-R"}
   },
   "i2c_devices": {
-    "BMI270": "0x68",
-    "DRV2605L": "0x5A"
+    "BMI270": {"addr": "0x68", "status": "PARITY"},
+    "DRV2605L": {"addr": "0x5A", "status": "PARITY"},
+    "IQS7222A": {"addr": "0x44", "status": "STUB_FROM_DATASHEET_DEFAULT", "note": "confirm ADDR strap on EVT1 schematic"},
+    "SE050C1HQ1": {"addr": "0x48", "status": "STUB_FROM_DATASHEET_DEFAULT", "note": "NXP Plug&Trust default; confirm"},
+    "npm1300": {"addr": "0x6B", "status": "STUB_FROM_NORDIC_DEFAULT", "note": "confirm vs hardware power tree"},
+    "BMM350": {"addr": "0x14", "status": "OPTIONAL_DNP"},
+    "BHI360": {"addr": "0x28", "status": "OPTIONAL_DNP"}
+  },
+  "spi_devices": {
+    "DWM3001C": {"status": "OPTIONAL_DNP", "cs_gpio": "TBD_on_schematic"}
   },
   "dedicated": ["SWDIO", "SWDCLK", "nRESET"],
-  "physical_boot": "RING_PHYSICAL_BOOT_PENDING"
+  "physical_boot": "RING_PHYSICAL_BOOT_PENDING",
+  "zephyr_app": "smoke printk only at fc617e83 — not full fusion firmware"
 }
