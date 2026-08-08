@@ -1,0 +1,7 @@
+total 1496
+drwxr-xr-x@  6 gunnchos  staff     192 Aug  7 19:29 .
+drwxr-xr-x@ 27 gunnchos  staff     864 Aug  7 19:29 ..
+-rw-r--r--@  1 gunnchos  staff     273 Aug  7 19:29 SHA256SUMS
+-rwxr-xr-x@  1 gunnchos  staff   18868 Aug  7 19:29 ring_zephyr_nrf52840.bin
+-rwxr-xr-x@  1 gunnchos  staff  684504 Aug  7 19:29 ring_zephyr_nrf52840.elf
+-rw-r--r--@  1 gunnchos  staff   53136 Aug  7 19:29 ring_zephyr_nrf52840.hex

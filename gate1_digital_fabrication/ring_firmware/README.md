@@ -2,7 +2,7 @@
 
 **Label:** development firmware (`0.1.0-dev`)  
 **Tokens (digital):** `RING_MCU_TARGET_FIRMWARE_BUILD_PASS` · `RING_MCUBOOT_DEV_PIPELINE_PASS` · `RING_PHYSICAL_BOOT_PENDING`  
-**Zephyr west:** `RING_ZEPHYR_WEST_BUILD_PASS` only when a real `west build` succeeds; otherwise soft-skip (see `docs/ZEPHYR_WEST_BLOCKER.md`).  
+**Zephyr west:** `RING_ZEPHYR_WEST_BUILD_PASS` — see `docs/ZEPHYR_WEST_BUILD_PASS.md` (Wave A real west build).  
 **Freeze:** PHYSICAL_EXECUTION_FREEZE ACTIVE — not flashed to physical hardware in this pass.
 
 ## Build
