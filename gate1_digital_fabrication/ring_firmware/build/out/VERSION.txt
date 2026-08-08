@@ -3,3 +3,4 @@ label: development
 board: edge_io_ring_evt0
 mcu: nRF52840
 physical_boot: PENDING
+digital: RING_FULL_FIRMWARE_DIGITAL_CANDIDATE

@@ -27,3 +27,6 @@ gate1_digital_fabrication/ring_firmware/build/*.o
 gate1_digital_fabrication/ring_firmware/build/*.elf
 !gate1_digital_fabrication/ring_firmware/build/out/
 gate1_digital_fabrication/ring_firmware/.toolchain/
+
+.venv-zephyr/
+.zephyr-workspace/

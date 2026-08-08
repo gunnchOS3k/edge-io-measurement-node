@@ -1,50 +1,205 @@
 /dts-v1/;
+
+/*
+ * Device tree for Edge I/O Ring EVT0/EVT1 — Continuation VI full digital firmware.
+ * Truthful nodes (no stub labels). PHYSICAL_EXECUTION_FREEZE — not physical boot.
+ *
+ * I2C addresses:
+ *   BMI270 0x68 (PARITY), DRV2605L 0x5A (PARITY),
+ *   IQS7222A 0x44 (datasheet default; ADDR strap — see EDA_PARITY note),
+ *   SE050 0x48 (NXP Plug&Trust default; confirm vs EVT1),
+ *   npm1300 0x6B (Nordic/Zephyr default).
+ * UWB CS: P0.20 EVT1_CANDIDATE — schematic previously TBD; hardware EDA must lock.
+ */
+
 / {
-  model = "gunnchOS Edge I/O Ring EVT0";
-  compatible = "gunnchos,edge-io-ring";
-  chosen {
-    zephyr,sram = &sram0;
-    zephyr,flash = &flash0;
-    zephyr,console = &uart0;
-  };
-  /*
-   * Continuation V parity stubs vs hardware BOM/schematic.
-   * PHYSICAL_EXECUTION_FREEZE — digital only; physical pin verify pending.
-   * See dts/pinout.json and docs/BOM_SCH_FW_PARITY_CONTINUATION_V.md
-   */
-  aliases {
-    imu-int = &imu_int;
-    chg-status = &chg_status;
-    imu-i2c = &i2c0;
-    cap-int = &cap_int;
-    se-irq = &se_irq;
-  };
-  gpio_inputs {
-    compatible = "gpio-keys";
-    imu_int: imu_int {
-      gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
-      label = "IMU_INT";
-    };
-    chg_status: chg_status {
-      gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
-      label = "CHG_STATUS";
-    };
-    cap_int: cap_int {
-      gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
-      label = "CAP_INT_IQS7222A_STUB";
-    };
-    se_irq: se_irq {
-      gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
-      label = "SE_IRQ_SE050_STUB";
-    };
-  };
+	model = "gunnchos Edge I/O Ring EVT0";
+	compatible = "gunnchos,edge-io-ring";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,console = &uart0;
+	};
+
+	aliases {
+		imu = &bmi270;
+		haptic = &drv2605l;
+		imu-int = &imu_int;
+		chg-status = &chg_status;
+		cap-int = &cap_int;
+		se-irq = &se_irq;
+		npm-int = &npm_int;
+		imu-i2c = &i2c0;
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-m4f";
+			reg = <0>;
+		};
+	};
+
+	soc {
+		compatible = "nordic,nRF52840-QIAA", "nordic,nRF52840", "nordic,nRF52", "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		flash-controller@4001e000 {
+			compatible = "nordic,nrf52-flash-controller";
+			reg = <0x4001e000 0x1000>;
+			flash0: flash@0 {
+				compatible = "soc-nv-flash";
+				reg = <0x00000000 0x100000>;
+				erase-block-size = <4096>;
+				write-block-size = <4>;
+				partitions {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					boot_partition: partition@0 {
+						label = "mcuboot";
+						reg = <0x00000000 0x0000C000>;
+					};
+					slot0_partition: partition@c000 {
+						label = "image-0";
+						reg = <0x0000C000 0x0006E000>;
+					};
+					slot1_partition: partition@7a000 {
+						label = "image-1";
+						reg = <0x0007A000 0x0006E000>;
+					};
+					scratch_partition: partition@e8000 {
+						label = "image-scratch";
+						reg = <0x000E8000 0x00010000>;
+					};
+				};
+			};
+		};
+
+		sram0: memory@20000000 {
+			compatible = "mmio-sram";
+			reg = <0x20000000 0x40000>;
+		};
+
+		uart0: uart@40002000 {
+			compatible = "nordic,nrf-uarte";
+			reg = <0x40002000 0x1000>;
+			status = "okay";
+		};
+
+		i2c0: i2c@40003000 {
+			compatible = "nordic,nrf-twi";
+			reg = <0x40003000 0x1000>;
+			status = "okay";
+			clock-frequency = <400000>;
+			pinctrl-0 = <&i2c0_default>;
+
+			bmi270: bmi270@68 {
+				compatible = "bosch,bmi270";
+				reg = <0x68>;
+				int-gpios = <&gpio0 11 0>; /* P0.11 IMU_INT */
+			};
+			drv2605l: drv2605l@5a {
+				compatible = "ti,drv2605l";
+				reg = <0x5a>;
+			};
+			iqs7222a: iqs7222a@44 {
+				compatible = "azoteq,iqs7222a";
+				reg = <0x44>;
+				int-gpios = <&gpio0 15 0>; /* P0.15 CAP_INT */
+			};
+			se050: se050@48 {
+				compatible = "nxp,se050";
+				reg = <0x48>;
+				irq-gpios = <&gpio0 16 0>; /* P0.16 SE_IRQ */
+			};
+			npm1300: npm1300@6b {
+				compatible = "nordic,npm1300";
+				reg = <0x6b>;
+				host-int-gpios = <&gpio0 3 0>; /* P0.03 NPM_INT */
+			};
+			/* Optional DNP magnetometer */
+			bmm350: bmm350@14 {
+				compatible = "bosch,bmm350";
+				reg = <0x14>;
+				status = "disabled";
+			};
+		};
+
+		spi0: spi@40004000 {
+			compatible = "nordic,nrf-spi";
+			reg = <0x40004000 0x1000>;
+			status = "disabled"; /* enabled in ring+UWB variant */
+			/* DWM3001C DNP — CS P0.20 EVT1_CANDIDATE (EDA lock required) */
+			dwm3001c: dwm3001c@0 {
+				compatible = "qorvo,dw3000";
+				reg = <0>;
+				spi-max-frequency = <8000000>;
+				irq-gpios = <&gpio0 17 0>; /* P0.17 UWB_IRQ */
+				cs-gpios = <&gpio0 20 0>; /* P0.20 UWB_CS EVT1_CANDIDATE */
+				status = "disabled";
+			};
+		};
+
+		gpio0: gpio@50000000 {
+			compatible = "nordic,nrf-gpio";
+			reg = <0x50000000 0x1000>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <32>;
+		};
+
+		wdt0: wdt@40010000 {
+			compatible = "nordic,nrf-wdt";
+			reg = <0x40010000 0x1000>;
+		};
+
+		usbd: usbd@40027000 {
+			compatible = "nordic,nrf-usbd";
+			reg = <0x40027000 0x1000>;
+			status = "okay";
+		};
+	};
+
+	gpio_inputs {
+		compatible = "gpio-keys";
+		imu_int: imu_int {
+			gpios = <&gpio0 11 0>;
+			label = "IMU_INT";
+		};
+		chg_status: chg_status {
+			gpios = <&gpio0 2 0>;
+			label = "CHG_STATUS";
+		};
+		cap_int: cap_int {
+			gpios = <&gpio0 15 0>;
+			label = "CAP_INT_IQS7222A";
+		};
+		se_irq: se_irq {
+			gpios = <&gpio0 16 0>;
+			label = "SE_IRQ_SE050";
+		};
+		npm_int: npm_int {
+			gpios = <&gpio0 3 0>;
+			label = "NPM_INT";
+		};
+		uwb_irq: uwb_irq {
+			gpios = <&gpio0 17 0>;
+			label = "UWB_IRQ_DWM3001C_DNP";
+		};
+	};
+
+	pinctrl {
+		compatible = "nordic,nrf-pinctrl";
+		i2c0_default: i2c0_default {
+			group1 {
+				psels = <0x1A>, <0x1B>; /* P0.26 SDA, P0.27 SCL */
+			};
+		};
+	};
 };
-&gpio0 { status = "okay"; };
-&i2c0 {
-  status = "okay";
-  /* SDA P0.26 SCL P0.27 — parity with hardware EVT0 assumption */
-  clock-frequency = <400000>;
-  /* Device nodes below are documentation stubs until drivers land */
-};
-&uart0 { status = "okay"; };
-&usbd { status = "okay"; };

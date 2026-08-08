@@ -49,9 +49,11 @@ jobs:
           st = json.loads(Path("build/out/STATUS.json").read_text())
           assert "RING_MCU_TARGET_FIRMWARE_BUILD_PASS" in st["tokens"]
           assert "RING_MCUBOOT_DEV_PIPELINE_PASS" in st["tokens"]
+          assert "RING_FULL_FIRMWARE_DIGITAL_PASS" in st["tokens"]
           assert "RING_PHYSICAL_BOOT_PENDING" in st["tokens"]
           assert "RING_ZEPHYR_WEST_BUILD_PASS" not in st["tokens"] or st.get("zephyr_west_build_pass") is True
           assert st["physical_boot_claimed"] is False
+          assert st.get("full_firmware_digital_pass") is True
           # Soft-skip west is expected on CI without full SDK
           assert "RING_ZEPHYR_WEST_BUILD_SOFT_SKIP" in st["tokens"] or st.get("zephyr_west_build_pass") is True
           pipe = json.loads(Path("build/out/MCUBOOT_PIPELINE_REPORT.json").read_text())

@@ -1,6 +1,6 @@
 # Zephyr / west digital probe
 
-Generated: `2026-08-07T23:40:26Z`
+Generated: `2026-08-08T21:00:23Z`
 
 ## Tokens
 ```text
