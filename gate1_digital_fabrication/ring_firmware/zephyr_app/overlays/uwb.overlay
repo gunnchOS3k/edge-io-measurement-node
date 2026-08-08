@@ -1,0 +1,7 @@
+&spi0 {
+	status = "okay";
+	cs-gpios = <&gpio0 20 0>;
+};
+&dwm3001c {
+	status = "okay";
+};

@@ -27,6 +27,10 @@ def main() -> int:
         "SHA256SUMS",
         "MCUBOOT_SIGN_REPORT.json",
         "VERSION.txt",
+        "BUILD_MATRIX_OK.txt",
+        "ring_firmware_matrix_base.elf",
+        "ring_firmware_matrix_uwb.elf",
+        "ring_firmware_matrix_mag.elf",
     ]
     missing = [r for r in required if not (OUT / r).exists()]
     build_pass = not missing
@@ -54,6 +58,27 @@ def main() -> int:
         west_soft = not west_pass
         west_blockers = list(west.get("blockers") or [])
 
+    # Full digital pass: drivers+app present, matrix OK, builds OK, no STUB in DT
+    dts = (ROOT / "dts" / "edge_io_ring.dts").read_text(encoding="utf-8")
+    drivers_ok = all(
+        (ROOT / p).is_file()
+        for p in (
+            "app/ring_app.c",
+            "drivers/bmi270/bmi270.c",
+            "drivers/iqs7222a/iqs7222a.c",
+            "drivers/se050/se050.c",
+            "drivers/npm1300/npm1300.c",
+            "drivers/dw3000/dw3000.c",
+            "drivers/bus/ring_bus_fake.c",
+        )
+    )
+    app_ok = "ring_app_init" in (ROOT / "zephyr_app" / "src" / "main.c").read_text(encoding="utf-8")
+    no_stub = ("CAP_INT_IQS7222A_STUB" not in dts and "SE_IRQ_SE050_STUB" not in dts and '_STUB"' not in dts)
+    matrix_ok = (OUT / "BUILD_MATRIX_OK.txt").exists()
+    full_digital = (
+        build_pass and pipe_ok and drivers_ok and app_ok and no_stub and matrix_ok
+    )
+
     tokens: list[str] = []
     if build_pass:
         tokens.append("RING_MCU_TARGET_FIRMWARE_BUILD_PASS")
@@ -67,6 +92,10 @@ def main() -> int:
         tokens.append("RING_ZEPHYR_WEST_BUILD_PASS")
     else:
         tokens.append("RING_ZEPHYR_WEST_BUILD_SOFT_SKIP")
+    if full_digital:
+        tokens.append("RING_FULL_FIRMWARE_DIGITAL_PASS")
+    else:
+        tokens.append("RING_FULL_FIRMWARE_DIGITAL_FAIL")
     tokens.append("RING_PHYSICAL_BOOT_PENDING")
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -79,8 +108,13 @@ def main() -> int:
         "tokens": tokens,
         "physical_boot_claimed": False,
         "missing_artifacts": missing,
-        "toolchain": "clang -target armv7em-none-eabi freestanding (Zephyr-shaped board/DT)",
+        "toolchain": "clang host + armv7em freestanding + portable drivers (Zephyr-shaped DT)",
         "mcuboot": "DEVELOPMENT sign/update/revert/factory-test/anti-replay pipeline",
+        "full_firmware_digital_pass": full_digital,
+        "drivers_ok": drivers_ok,
+        "app_ok": app_ok,
+        "matrix_ok": matrix_ok,
+        "no_stub_dts": no_stub,
         "zephyr_west_build_pass": west_pass,
         "zephyr_west_soft_skip": west_soft,
         "zephyr_west_blockers": west_blockers,
@@ -98,17 +132,19 @@ def main() -> int:
             *tokens,
             "```",
             "",
-            "Label: **development firmware** (freestanding ARM + host/native_sim).",
+            "Label: **development firmware** (portable drivers + fusion app + host/native_sim).",
             "MCUboot: DEVELOPMENT sign/update/revert/factory-test/anti-replay.",
+            "",
+            "## Continuation VI",
+            "- Real device tree nodes (no *_STUB labels)",
+            "- Portable drivers: BMI270, IQS7222A, SE050, npm1300, DW3000(DNP), BMM350(opt)",
+            "- Fusion application: boot diag, sample, auth packet, BLE, cal, DFU, health",
+            "- Build matrix: base / uwb / mag / debug / release-dev + MCUboot DEV",
             "",
             "## Not claimed",
             "- Physical ring flash / boot",
             "- Production MCUboot keys",
-            "- `RING_ZEPHYR_WEST_BUILD_PASS` unless west build truly succeeded",
-            "",
-            "## Zephyr / west",
-            "Isolated `.toolchain/west-venv` when present; full SDK soft-skip documented in",
-            "`docs/ZEPHYR_WEST_BLOCKER.md`.",
+            "- Full NXP Plug&Trust middleware (lite identity/auth path only)",
             "",
             "## Build",
             "```bash",
@@ -116,17 +152,13 @@ def main() -> int:
             "make clean && make all",
             "```",
             "",
-            "## Artifacts",
-            "`build/out/ring_firmware_{debug,release_development}.{elf,bin,hex,map}`",
-            "`build/out/mcuboot_pipeline/` · `SHA256SUMS`",
-            "",
         ]
     )
     (DOCS / "FIRMWARE_STATUS.md").write_text(body, encoding="utf-8")
     (GATE_DOCS / "RING_FIRMWARE_STATUS.md").write_text(body, encoding="utf-8")
     (OUT / "STATUS.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(" ".join(tokens))
-    return 0 if build_pass and pipe_ok else 1
+    return 0 if build_pass and pipe_ok and full_digital else 1
 
 
 if __name__ == "__main__":
