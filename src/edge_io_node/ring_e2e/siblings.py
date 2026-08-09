@@ -16,6 +16,7 @@ def repos_root() -> Path:
 def load_authenticated_ring_input():
     candidates = [
         repos_root() / "gunnchos-hardware-industrial-design" / "ring_input" / "python",
+        Path(__file__).resolve().parents[3] / ".deps" / "gunnchos-hardware-industrial-design" / "ring_input" / "python",
         Path(
             "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/"
             "gunnchos-hardware-industrial-design/ring_input/python"
@@ -32,6 +33,7 @@ def load_authenticated_ring_input():
 def load_gunnchos_ring_adapter():
     candidates = [
         repos_root() / "gunnchos-device-os",
+        Path(__file__).resolve().parents[3] / ".deps" / "gunnchos-device-os",
         Path(
             "/Users/gunnchos/Downloads/gunnchos-7gc-research-product-spine/repos/"
             "gunnchos-device-os"

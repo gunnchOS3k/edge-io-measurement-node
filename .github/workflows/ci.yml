@@ -29,6 +29,12 @@ jobs:
           repository: ${{ github.repository_owner }}/gunnchos-hardware-industrial-design
           path: .deps/gunnchos-hardware-industrial-design
           # Same-org GITHUB_TOKEN; fails loudly if inaccessible (do not weaken)
+      - name: Checkout gunnchOS device-os sibling (ring service)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/gunnchos-device-os
+          path: .deps/gunnchos-device-os
+          ref: main
       - name: Checkout field-kit sibling (canonical contracts)
         uses: actions/checkout@v4
         with:
@@ -40,8 +46,10 @@ jobs:
           set -euo pipefail
           parent="$(dirname "$GITHUB_WORKSPACE")"
           ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-hardware-industrial-design" "$parent/gunnchos-hardware-industrial-design"
+          ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-device-os" "$parent/gunnchos-device-os"
           ln -sfn "$GITHUB_WORKSPACE/.deps/gunnchos-7gc-ai-ran-field-kit" "$parent/gunnchos-7gc-ai-ran-field-kit"
           test -f "$parent/gunnchos-hardware-industrial-design/ring_input/python/authenticated_ring_input/__init__.py"
+          test -f "$parent/gunnchos-device-os/ring_input/adapter.py"
           test -f "$parent/gunnchos-7gc-ai-ran-field-kit/scripts/validate_contract.py"
           echo "Linked siblings under $parent"
       - name: Install dependencies
