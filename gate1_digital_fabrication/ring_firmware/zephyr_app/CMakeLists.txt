@@ -16,6 +16,7 @@ target_sources(app PRIVATE
   src/main.c
   ${RING_FW_ROOT}/app/ring_app.c
   ${RING_FW_ROOT}/drivers/bus/ring_bus_fake.c
+  ${RING_FW_ROOT}/drivers/bus/ring_bus_zephyr.c
   ${RING_FW_ROOT}/drivers/bmi270/bmi270.c
   ${RING_FW_ROOT}/drivers/iqs7222a/iqs7222a.c
   ${RING_FW_ROOT}/drivers/se050/se050.c

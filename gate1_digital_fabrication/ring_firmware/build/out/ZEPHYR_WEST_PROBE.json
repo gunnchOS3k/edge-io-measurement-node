@@ -1,7 +1,24 @@
 {
-  "generated_at_utc": "2026-08-08T21:01:20Z",
-  "west_build_pass": true,
-  "board": "nrf52840dk/nrf52840",
-  "app": "zephyr_app full fusion",
-  "blockers": []
+  "generated_at_utc": "2026-08-09T17:15:31Z",
+  "west_present": true,
+  "west_path": ".toolchain/west-venv/bin/west",
+  "west_version": "West version: v1.5.0",
+  "zephyr_base": null,
+  "zephyr_sdk_install_dir": null,
+  "isolated_venv": ".toolchain/west-venv",
+  "global_pip_pollution": false,
+  "west_build_pass": false,
+  "west_build_note": "blocked_incomplete_toolchain",
+  "blockers": [
+    "ZEPHYR_BASE unset/missing \u2014 full zephyrproject west init/update not performed (multi-GB modules; not installed in this digital pass)",
+    "ZEPHYR_SDK_INSTALL_DIR unset/missing \u2014 full Zephyr SDK ~1.1GB macos-aarch64 archive download blocked/deferred (policy + disk headroom); freestanding clang ARM path remains authoritative"
+  ],
+  "tokens": [
+    "RING_ZEPHYR_WEST_BUILD_SOFT_SKIP",
+    "RING_PHYSICAL_BOOT_PENDING"
+  ],
+  "physical_boot_claimed": false,
+  "authoritative_build_path": "clang -target armv7em-none-eabi freestanding",
+  "full_sdk_size_hint_bytes": 1112069596,
+  "disk_policy": "prefer isolated venv; defer multi-GB SDK unless explicitly approved"
 }

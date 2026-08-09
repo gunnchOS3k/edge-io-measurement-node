@@ -24,6 +24,8 @@ static int fake_i2c_write_read(ring_i2c_bus_t *bus, uint8_t addr7,
       return RING_BUS_OK;
     }
     if (reg == 0x00 && rn) { r[0] = 0x24; return RING_BUS_OK; }
+    if (reg == 0x02 && rn) { r[0] = 0x00; return RING_BUS_OK; } /* ERR_REG */
+    if (reg == 0x03 && rn) { r[0] = 0x01; return RING_BUS_OK; } /* STATUS */
     if (reg == 0x0C && rn >= 6) {
       /* az ~ 1g */
       r[4] = 0x00; r[5] = 0x10;
@@ -34,8 +36,11 @@ static int fake_i2c_write_read(ring_i2c_bus_t *bus, uint8_t addr7,
   }
   if (addr7 == 0x44) { /* IQS7222A */
     if (reg == 0x00 && rn) { r[0] = 0x42; return RING_BUS_OK; }
+    if (reg == 0x01 && rn) { r[0] = 0x01; return RING_BUS_OK; }
     if (reg == 0x10 && rn) { r[0] = 0x01; return RING_BUS_OK; }
     if (reg == 0x11 && rn) { r[0] = 0x03; return RING_BUS_OK; }
+    if (reg == 0x12 && rn) { r[0] = 0x00; return RING_BUS_OK; } /* count LSB */
+    if (reg == 0x13 && rn) { r[0] = 0x08; return RING_BUS_OK; } /* count MSB ~2048 */
     return RING_BUS_OK;
   }
   if (addr7 == 0x48) { /* SE050 */
@@ -43,6 +48,12 @@ static int fake_i2c_write_read(ring_i2c_bus_t *bus, uint8_t addr7,
       if (rn >= 1) r[0] = 0x5E;
       for (size_t i = 1; i < rn && i < 8; i++) r[i] = (uint8_t)(0x10 + i);
       for (size_t i = 8; i < rn && i < 24; i++) r[i] = (uint8_t)(0xE0 + (i - 8));
+      return RING_BUS_OK;
+    }
+    if (reg == 0xB1) {
+      /* Challenge echo window: XOR with fixed DEV key material */
+      for (size_t i = 0; i < rn && i < 16; i++)
+        r[i] = (uint8_t)(fb->se_challenge[i] ^ 0x3C);
       return RING_BUS_OK;
     }
     return RING_BUS_OK;
@@ -60,6 +71,7 @@ static int fake_i2c_write_read(ring_i2c_bus_t *bus, uint8_t addr7,
       return RING_BUS_OK;
     }
     if (reg == 0x02 && rn) { r[0] = 0x01; return RING_BUS_OK; }
+    if (reg == 0x40 && rn) { r[0] = 0x00; return RING_BUS_OK; } /* BCHG_ERR */
     return RING_BUS_OK;
   }
   if (addr7 == 0x14) { /* BMM350 */
@@ -71,7 +83,14 @@ static int fake_i2c_write_read(ring_i2c_bus_t *bus, uint8_t addr7,
 
 static int fake_i2c_write(ring_i2c_bus_t *bus, uint8_t addr7,
                           const uint8_t *w, size_t wn) {
-  (void)bus; (void)addr7; (void)w; (void)wn;
+  ring_fake_bus_t *fb = as_fb(bus);
+  if (!fb || !w || wn < 1) return RING_BUS_ERR_INVAL;
+  fb->last_write_addr = addr7;
+  fb->last_write_reg = w[0];
+  fb->write_count++;
+  if (addr7 == 0x48 && w[0] == 0xB0 && wn >= 17) {
+    for (size_t i = 0; i < 16; i++) fb->se_challenge[i] = w[1 + i];
+  }
   return RING_BUS_OK;
 }
 
@@ -81,7 +100,10 @@ static int fake_spi_xfer(ring_spi_bus_t *bus, uint8_t cs_id,
   (void)cs_id;
   if (!fb || !tx || !rx || n < 2) return RING_BUS_ERR_INVAL;
   memset(rx, 0, n);
-  if (tx[0] == 0x00) { rx[1] = 0xDE; return RING_BUS_OK; }
+  if (tx[0] == 0x00) { rx[1] = 0xDE; return RING_BUS_OK; } /* DEV_ID */
+  if (tx[0] == 0x10) { rx[1] = tx[1]; return RING_BUS_OK; } /* SYS_CFG echo */
+  if (tx[0] == 0x11) { rx[1] = 0x01; return RING_BUS_OK; } /* SYS_STATUS OK */
+  if (tx[0] == 0x7F) { return RING_BUS_OK; } /* soft reset */
   if (tx[0] == 0x01 && n >= 5) {
     rx[1] = 0xE8; rx[2] = 0x03; /* 1000 mm */
     return RING_BUS_OK;

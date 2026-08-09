@@ -1,0 +1,13 @@
+# Copyright (c) 2026 gunnchOS3k
+# SPDX-License-Identifier: Apache-2.0
+
+description: Azoteq IQS7222A capacitive touch controller
+
+compatible: "azoteq,iqs7222a"
+
+include: [i2c-device.yaml, base.yaml]
+
+properties:
+  int-gpios:
+    type: phandle-array
+    description: Active interrupt GPIO for touch events

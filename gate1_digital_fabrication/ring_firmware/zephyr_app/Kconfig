@@ -1,0 +1,10 @@
+# Copyright (c) 2026 gunnchOS3k
+# SPDX-License-Identifier: Apache-2.0
+
+config RING_USE_FAKE_BUS
+	bool "Use fake I2C/SPI backends for digital DK bring-up"
+	default y
+	help
+	  When y, the Zephyr application binds portable drivers to the host
+	  fake-bus (no on-board sensors). Set n on EVT silicon to use
+	  DEVICE_DT_GET I2C/SPI (Zephyr-native production path).

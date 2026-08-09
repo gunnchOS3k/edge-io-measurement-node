@@ -88,7 +88,7 @@ test: build/test_ring_fw.elf build/test_ring_app.elf build/ring_fw_host.elf
 	./build/test_ring_fw.elf
 	./build/test_ring_app.elf
 	./build/ring_fw_host.elf
-	$(PY) -m pytest -q tests/test_protocol_host.py tests/test_pinout_board.py tests/test_mcuboot_fixtures.py tests/test_mcuboot_pipeline.py tests/test_ble_stub.py tests/test_full_firmware_digital.py
+	$(PY) -m pytest -q tests/test_protocol_host.py tests/test_pinout_board.py tests/test_mcuboot_fixtures.py tests/test_mcuboot_pipeline.py tests/test_ble_stub.py tests/test_full_firmware_digital.py tests/test_continuation_vii.py
 
 host: build/ring_fw_host.elf
 	./build/ring_fw_host.elf
