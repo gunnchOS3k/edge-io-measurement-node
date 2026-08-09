@@ -1,0 +1,13 @@
+# Copyright (c) 2026 gunnchOS3k
+# SPDX-License-Identifier: Apache-2.0
+
+description: NXP SE050 secure element (identity/auth digital path)
+
+compatible: "nxp,se050"
+
+include: [i2c-device.yaml, base.yaml]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+    description: SE050 IRQ GPIO

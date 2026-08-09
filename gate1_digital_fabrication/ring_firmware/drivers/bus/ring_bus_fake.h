@@ -19,6 +19,10 @@ typedef struct {
   uint32_t sample_count;
   uint32_t drop_every_n; /* packet loss */
   uint32_t last_seq_seen; /* replay detection helper */
+  uint32_t write_count;
+  uint8_t last_write_addr;
+  uint8_t last_write_reg;
+  uint8_t se_challenge[16];
 } ring_fake_bus_t;
 
 void ring_fake_bus_init(ring_fake_bus_t *fb, ring_fake_mode_t mode);

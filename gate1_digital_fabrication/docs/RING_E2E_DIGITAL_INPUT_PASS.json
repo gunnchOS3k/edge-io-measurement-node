@@ -1,0 +1,33 @@
+{
+  "tokens": [
+    "RING_END_TO_END_DIGITAL_INPUT_PASS",
+    "RING_PHYSICAL_BOOT_PENDING"
+  ],
+  "ok": true,
+  "exercised": {
+    "keyboard": true,
+    "pointer": true,
+    "scroll": true,
+    "click": true,
+    "chord": true,
+    "game_button": true,
+    "analog": true,
+    "destructive": true,
+    "low_confidence_destructive": true,
+    "replay": true,
+    "lost_ring": true,
+    "reconnect": true
+  },
+  "stages": {
+    "fake_buses_firmware": true,
+    "auth_packet_seed": true,
+    "calibration": true,
+    "gunnchos_ring_service": true,
+    "ble_sim": true,
+    "classifier": true,
+    "input_routing": true,
+    "app_game_feedback": true
+  },
+  "evidence_class": "SOFTWARE_SIMULATED",
+  "physical_boot": false
+}

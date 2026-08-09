@@ -1,0 +1,16 @@
+# Copyright (c) 2026 gunnchOS3k
+# SPDX-License-Identifier: Apache-2.0
+
+description: Qorvo DW3000 / DWM3001C UWB transceiver
+
+compatible: "qorvo,dw3000"
+
+include: [spi-device.yaml, base.yaml]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+    description: DW3000 IRQ GPIO
+  cs-gpios:
+    type: phandle-array
+    description: Chip-select GPIO (EVT1 candidate P0.20)

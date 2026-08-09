@@ -70,9 +70,21 @@ def main() -> int:
             "drivers/npm1300/npm1300.c",
             "drivers/dw3000/dw3000.c",
             "drivers/bus/ring_bus_fake.c",
+            "drivers/bus/ring_bus_zephyr.c",
         )
     )
-    app_ok = "ring_app_init" in (ROOT / "zephyr_app" / "src" / "main.c").read_text(encoding="utf-8")
+    main_c = (ROOT / "zephyr_app" / "src" / "main.c").read_text(encoding="utf-8")
+    app_ok = "ring_app_init" in main_c
+    zephyr_native_ok = all(
+        s in main_c
+        for s in (
+            "DEVICE_DT_GET",
+            "settings_subsys_init",
+            "bt_enable",
+            "pm_device_action_run",
+            "ring_zephyr_bus_bind",
+        )
+    )
     no_stub = ("CAP_INT_IQS7222A_STUB" not in dts and "SE_IRQ_SE050_STUB" not in dts and '_STUB"' not in dts)
     matrix_ok = (OUT / "BUILD_MATRIX_OK.txt").exists()
     full_digital = (
@@ -96,6 +108,10 @@ def main() -> int:
         tokens.append("RING_FULL_FIRMWARE_DIGITAL_PASS")
     else:
         tokens.append("RING_FULL_FIRMWARE_DIGITAL_FAIL")
+    if zephyr_native_ok:
+        tokens.append("RING_ZEPHYR_NATIVE_PATH_DIGITAL_PASS")
+    else:
+        tokens.append("RING_ZEPHYR_NATIVE_PATH_DIGITAL_FAIL")
     tokens.append("RING_PHYSICAL_BOOT_PENDING")
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -111,6 +127,7 @@ def main() -> int:
         "toolchain": "clang host + armv7em freestanding + portable drivers (Zephyr-shaped DT)",
         "mcuboot": "DEVELOPMENT sign/update/revert/factory-test/anti-replay pipeline",
         "full_firmware_digital_pass": full_digital,
+        "zephyr_native_path_ok": zephyr_native_ok,
         "drivers_ok": drivers_ok,
         "app_ok": app_ok,
         "matrix_ok": matrix_ok,
@@ -135,16 +152,20 @@ def main() -> int:
             "Label: **development firmware** (portable drivers + fusion app + host/native_sim).",
             "MCUboot: DEVELOPMENT sign/update/revert/factory-test/anti-replay.",
             "",
-            "## Continuation VI",
+            "## Continuation VII",
+            "- Driver depth: configure/recover/diagnostics for BMI270, IQS7222A, SE050, npm1300, DW3000",
+            "- Zephyr-native path: DEVICE_DT_GET, I2C/SPI bus, BLE, settings, PM, MCUboot Kconfig",
+            "- E2E digital input scenario token: RING_END_TO_END_DIGITAL_INPUT_PASS (repo tests)",
+            "",
+            "## Continuation VI (retained)",
             "- Real device tree nodes (no *_STUB labels)",
-            "- Portable drivers: BMI270, IQS7222A, SE050, npm1300, DW3000(DNP), BMM350(opt)",
-            "- Fusion application: boot diag, sample, auth packet, BLE, cal, DFU, health",
-            "- Build matrix: base / uwb / mag / debug / release-dev + MCUboot DEV",
+            "- Portable drivers + fusion application + build matrix + MCUboot DEV",
             "",
             "## Not claimed",
             "- Physical ring flash / boot",
             "- Production MCUboot keys",
             "- Full NXP Plug&Trust middleware (lite identity/auth path only)",
+            "- Physical accuracy / latency",
             "",
             "## Build",
             "```bash",
