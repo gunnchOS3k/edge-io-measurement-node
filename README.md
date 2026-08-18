@@ -2,6 +2,20 @@
 
 Ring / Edge I/O **sensing and measurement** stack for gunnchOS3k — privacy-first telemetry, firmware paths, and Lab-facing contracts.
 
+| Item | Detail |
+|------|--------|
+| **Runs today** | Research prototype with smoke test (synthetic, non-evidence) |
+| **Demo** | `make smoke` (smoke test only — not readiness proof) |
+| **Reproduce** | `make reproduce` — synthetic RQ3 path; see [REPRODUCIBILITY.md](REPRODUCIBILITY.md) |
+| **UML** | [docs/uml/README.md](docs/uml/README.md) |
+| **Pixel 6a** | [docs/PIXEL_6A_ACCEPTANCE.md](docs/PIXEL_6A_ACCEPTANCE.md) (`PHYSICAL_PENDING`) |
+| **Data** | Synthetic only — no private IQ or PII |
+| **Extend** | See [EXTERNAL_RESEARCHER_QUICKSTART.md](docs/EXTERNAL_RESEARCHER_QUICKSTART.md) |
+| **Limits** | Not operational 6G; not Oulu affiliation; not carrier-grade |
+| **Readiness** | [END_TO_END_READINESS.md](docs/END_TO_END_READINESS.md) |
+| **Smoke test** | [E2E_RUN_RECORD.md](reproducibility/E2E_RUN_RECORD.md) |
+| **Artifacts** | [results/e2e/](results/e2e/) |
+
 > **Current release/state:** `PHYSICAL_PENDING` — digital pipelines + synthetic smoke exist; absolute spatial accuracy on hardware is pending.
 
 Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) · Product charter: [gunnchOS3k_PRODUCT_CHARTER.md](https://github.com/gunnchOS3k/gunnchos-7gc-ai-ran-field-kit/blob/main/program/charter/gunnchOS3k_PRODUCT_CHARTER.md)
