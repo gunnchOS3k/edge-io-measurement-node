@@ -1,5 +1,6 @@
-# Edge-IO Measurement Node
-## End-to-End Research Artifact
+# edge-io-measurement-node
+
+Ring / Edge I/O **sensing and measurement** stack for gunnchOS3k — privacy-first telemetry, firmware paths, and Lab-facing contracts.
 
 | Item | Detail |
 |------|--------|
@@ -15,181 +16,108 @@
 | **Smoke test** | [E2E_RUN_RECORD.md](reproducibility/E2E_RUN_RECORD.md) |
 | **Artifacts** | [results/e2e/](results/e2e/) |
 
-Reframes **Edge-IO** and gunnchOS devices as **low-cost edge measurement endpoints** for 6G education, AI inference, and network quality measurement.
+> **Current release/state:** `PHYSICAL_PENDING` — digital pipelines + synthetic smoke exist; absolute spatial accuracy on hardware is pending.
 
-> **Research prototype** — not certified consumer hardware. All collection **opt-in** and **privacy-preserving**.
-
-
----
+Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) · Product charter: [gunnchOS3k_PRODUCT_CHARTER.md](https://github.com/gunnchOS3k/gunnchos-7gc-ai-ran-field-kit/blob/main/program/charter/gunnchOS3k_PRODUCT_CHARTER.md)
 
 ## What is this?
 
-**Capture privacy-first edge network experience metrics to calibrate digital twins—not synthetic-only forever.**
+Schemas, probes, firmware/research paths, and opt-in telemetry for Edge I/O Rings and related measurement nodes.
 
-| | |
-|---|---|
-| **Status** | Evidence-building measurement prototype |
-| **Evidence today** | Level 1 smoke test — see [Evidence status](#evidence-status-smoke-test-vs-real-validation) |
-| **Start** | [docs/START_HERE.md](docs/START_HERE.md) |
+## Why does it exist?
 
-## What problem does this solve?
+Embodied input and honest network/experience metrics need a dedicated measurement layer with consent and claim discipline.
 
-**Human:** Twins without real device experience misrepresent latency and outages communities actually feel.
+## Where does it fit?
 
-**Technical:** Schema-validated, consent-gated telemetry export to 7GC.
+Product Charter **layer 7** (Ring sensing/measurement). Consumed by `gunnchos-device-os` Ring/input paths.
 
-**Who is harmed if unsolved:** Students and residents if measurements leak PII or mislead planners.
+## What is real today?
 
-**Gary / 7GC / digital equality:** This repo supports equitable connectivity research for under-connected communities; Gary is the flagship urban anchor where applicable.
+- Schema-validated synthetic / smoke telemetry (`make smoke` / `make e2e`)
+- Privacy helpers and 7GC/Lab export contracts
+- Firmware and gate1 digital fabrication *research* artifacts as documented in-tree
 
-## Beginner mental model
+## What is simulated / modelled?
 
-A **fitness tracker for network experience**, with consent and deletion built in.
+- Synthetic measurement batches and emulator-style probes
+- Spatial accuracy labelled SIMULATED until physical calibration
 
-## How this repo addresses the problem
+## What is physical / external pending?
 
-Telemetry schema, privacy helpers, demo/smoke generator, 7GC export contract.
+- Physical Ring spatial registration / anti-spoof / comfort (E6)
+- Representative field campaigns (not citywide claims)
+- Any carrier or certification claim — **not authorized**
 
-**Main output:** Synthetic smoke packets + export JSON (not field-validated until real clients ship).
-
-**Output does NOT prove:** Representative city-wide measurement campaign.
-
-## How this fits gunnchOS3k MLV
-
-Sensory layer for 7GC; connects device OS and field pilots.
-
-Deep dive: [docs/HOW_THIS_FITS_GUNNCHOS.md](docs/HOW_THIS_FITS_GUNNCHOS.md) · [docs/CROSS_REPO_DEPENDENCY_MAP.md](docs/CROSS_REPO_DEPENDENCY_MAP.md) (where present)
-
-## How this fits 6G PhD research
-
-Relevant themes: **Edge AI measurement · trust/privacy · digital twin calibration · ubiquitous connectivity**
-
-Oulu/CWC-style alignment (research direction, not affiliation claim): [docs/HOW_THIS_FITS_6G_PHD_RESEARCH.md](docs/HOW_THIS_FITS_6G_PHD_RESEARCH.md)
-
-## What exists today
-
-- Python package
-- Privacy fields
-- 7GC export
-- `make smoke`
-
-Details: [docs/WHAT_IS_REAL_TODAY.md](docs/WHAT_IS_REAL_TODAY.md)
-
-## Evidence status: smoke test vs real validation
-
-- `make smoke` / `make e2e` = **CI smoke test** — proves code runs, **not** that research claims are field-validated.
-- See [docs/NO_MORE_TOY_DEMOS.md](docs/NO_MORE_TOY_DEMOS.md) · [docs/EVIDENCE_STANDARD.md](docs/EVIDENCE_STANDARD.md) · [quality/CLAIMS_TO_EVIDENCE_MATRIX.md](quality/CLAIMS_TO_EVIDENCE_MATRIX.md)
-
-**Next real evidence needed:**
-
-- Real app/device client
-- Consent UX
-- Schema validation on real data
-- School privacy review
-
-## Run or inspect this repo
+## Try / inspect in 5 minutes
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-make smoke
+make test
+make smoke   # synthetic — not field evidence
 ```
+See [docs/EXTERNAL_RESEARCHER_QUICKSTART.md](docs/EXTERNAL_RESEARCHER_QUICKSTART.md).
 
-| | |
+## Architecture
+
+Python package + `firmware/` + `fixtures/` + privacy/consent gates + export contracts toward Lab / research twin consumers.
+
+## Repo map
+
+| Path | Role |
 |---|---|
-| **Output** | `results/e2e/ telemetry export sample` |
-| **Means** | Reproducible smoke artifacts for CI and reviewers |
-| **Does not mean** | Conference, adoption, or manufacturing readiness |
+| `clients/` / package code | Measurement clients |
+| `firmware/` | Ring/node firmware research |
+| `fixtures/` | Valid synthetic batches |
+| `physical_evidence/` | Physical capture staging |
+| `docs/` | Protocols and claim honesty |
 
-Video: [docs/video_walkthrough_script.md](docs/video_walkthrough_script.md)
+## Interfaces
 
-## Visual map
+JSON telemetry contracts consumed by device-os / field-kit pipelines. Opt-in only; no PII by default.
 
-```mermaid
-flowchart LR
-  Device[gunnchos-device-os] --> EdgeIO[edge-io]
-  EdgeIO --> Twin[7gc-digital-twin]
+## Tests
+
+```bash
+make lint test contract-test
 ```
 
-More diagrams: [docs/diagrams/README.md](docs/diagrams/README.md) (if present) · [docs/uml/README.md](docs/uml/README.md) (spectrumx)
+## Evidence
 
-## Start here based on who you are
+[reproducibility/](reproducibility/) and `results/` smoke records. Field-validated campaigns are separate.
 
-| Reader | Start here | You will learn |
-|--------|------------|----------------|
-| Beginner | [docs/PLAIN_ENGLISH_EXPLANATION.md](docs/PLAIN_ENGLISH_EXPLANATION.md) | Idea without jargon |
-| Student / WAIKE | [docs/AUDIENCE_GUIDE.md](docs/AUDIENCE_GUIDE.md) | Learning path |
-| Researcher / professor | [docs/HOW_THIS_FITS_6G_PHD_RESEARCH.md](docs/HOW_THIS_FITS_6G_PHD_RESEARCH.md) | Research fit |
-| Contributor | [CONTRIBUTING.md](CONTRIBUTING.md) or Issues | How to help |
-| City / school partner | [docs/PROBLEM_SOLUTION_MAP.md](docs/PROBLEM_SOLUTION_MAP.md) | Why it matters locally |
+## Known gaps
 
-## What would make this final?
+Physical spatial accuracy, HIL Ring-to-app proof, non-synthetic community measurement sets.
 
-**Not satisfied yet** for final / conference / adoption / manufacturing gates—see audit:
+## Beginner path
 
-- [docs/WHAT_WOULD_MAKE_THIS_FINAL.md](docs/WHAT_WOULD_MAKE_THIS_FINAL.md)
-- [quality/FINAL_READINESS_CONFIRMATION.md](quality/FINAL_READINESS_CONFIRMATION.md)
+Think of a **consenting fitness tracker for network/input experience** — not a spy tool.
 
-## Roadmap from current state to final readiness
+## Intern path
 
-| Gate | Status |
-|------|--------|
-| Concept | Met |
-| Smoke test | Met (`make smoke`) |
-| Real evidence pipeline | Open |
-| Benchmark / field data | Open |
-| Internal validation | Open |
-| External reproduction | Open |
-| Candidate release | Open |
-| Final | Not claimed |
+Run `make smoke`, open one fixture, and map fields to the claim boundary.
 
-Full table: [quality/READINESS_GATE_TABLE.md](quality/READINESS_GATE_TABLE.md)
+## Expert path
 
-## Related repos in the 7GC research spine
+Tighten firmware/Lab contracts; keep `physical_spatial_pending` honest.
 
+## Contribution path
 
-| Repo | Role |
-|------|------|
-| [7gc-digital-twin](https://github.com/gunnchOS3k/7gc-digital-twin) | Community digital twin spine |
-| [spectrumx-ai-ran-gary](https://github.com/gunnchOS3k/spectrumx-ai-ran-gary) | AI-RAN + SpectrumX competition path |
-| [readygary-6g-beam-selection](https://github.com/gunnchOS3k/readygary-6g-beam-selection) | Beam selection / PHY-facing evidence |
-| [edge-io-measurement-node](https://github.com/gunnchOS3k/edge-io-measurement-node) | Privacy-first edge measurement |
-| [ntn-resilience-sim](https://github.com/gunnchOS3k/ntn-resilience-sim) | NTN + terrestrial resilience |
-| [waike-research-ops](https://github.com/gunnchOS3k/waike-research-ops) | Education & workforce pipeline |
-| [gunnchos-hardware-industrial-design](https://github.com/gunnchOS3k/gunnchos-hardware-industrial-design) | Device hardware EVT planning |
-| [gunnchos-device-os](https://github.com/gunnchOS3k/gunnchos-device-os) | School/research device OS prototype |
-| [gunnchAI3k](https://github.com/gunnchOS3k/gunnchAI3k) | Learning assistant (where relevant) |
+Schemas, tests, privacy, firmware harnesses. No unauthorized RF collection.
 
+## Current release / state
 
-## Claims and non-claims
+**PHYSICAL_PENDING**. Research prototype — not certified consumer hardware.
 
-**Supports today:** Runnable scaffold, documented methods, smoke-test artifacts, honest limitations.
+## Claim boundary
 
-**Does not prove yet:** Representative city-wide measurement campaign.
-
-**Requires evidence issues:** See GitHub `[Evidence TODO]` issues and `quality/CLAIMS_TO_EVIDENCE_MATRIX.md`.
+No commercial 6G · no certification · IMU alone ≠ absolute spatial registration · Cursor DRAFT-only.
 
 ---
 
-## Measures (planned)
+## Retained detail (post–Cycle 3A front door)
 
-Latency, jitter, packet loss, RSSI, device temperature, CPU/GPU utilization, offline AI timing, interaction traces (aggregated).
+Full historical README: [docs/history/README_PRE_WP012.md](docs/history/README_PRE_WP012.md).
 
-## 7GC spine
-
-Exports to [7gc-digital-twin](https://github.com/gunnchOS3k/7gc-digital-twin) via `export_to_7gc.py` contract.
-
-```bash
-pip install -r requirements.txt && pytest -q
-```
-
-## Industry / research-grade tooling alignment
-
-| Tool / ecosystem | Why it matters | Adapter | Runs now? | Access? |
-|------------------|----------------|---------|-----------|---------|
-| See matrix | Evidence upgrade path | `industry_research_stack/` | Stub exports | Optional |
-
-**Commands:** `make e2e` (includes tool export stubs) · `python3 scripts/run_all_tool_exports.py`
-
-**Notice:** Aligned with public research ecosystems — [non-affiliation](industry_research_stack/NON_AFFILIATION_NOTICE.md). Smoke stubs only unless documented otherwise.
-
+Useful retained entrypoints: [docs/START_HERE.md](docs/START_HERE.md) · [docs/WHAT_IS_REAL_TODAY.md](docs/WHAT_IS_REAL_TODAY.md) · [docs/END_TO_END_READINESS.md](docs/END_TO_END_READINESS.md).
