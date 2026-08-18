@@ -12,10 +12,18 @@ class ClassifiedIntent:
     confidence: float
     payload: dict[str, Any]
     destructive: bool = False
+    pose_claim: str = "relative_cues_only_not_absolute_pose"
+    spatial_accuracy: str = "PHYSICAL_PENDING"
 
 
 class SpatialInputClassifier:
-    """Maps IMU/cap fusion cues to OS/game input intents."""
+    """Maps IMU/cap fusion cues to OS/game input intents.
+
+    IMU axes here are **relative software cues**. They are not a validated
+    absolute pose, and spatial accuracy remains PHYSICAL_PENDING until the
+    physical calibration procedure in docs/PHYSICAL_CALIBRATION_PROCEDURE.md
+    is executed and recorded.
+    """
 
     def classify(self, frame: dict[str, Any], *, gesture: str | None = None) -> ClassifiedIntent:
         if gesture:

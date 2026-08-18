@@ -284,6 +284,21 @@ def main(argv=None):
     ds.add_argument("--session", required=True)
     ds.set_defaults(func=_cmd_delete_session)
 
+    def _cmd_research_export(args: argparse.Namespace) -> int:
+        from .research_export import export_research_pack
+        from .synthetic_device_emulator import emulate_samples
+
+        samples = emulate_samples(int(args.n))
+        pack = export_research_pack(samples, site_id=args.site, out_dir=Path(args.out_dir) if args.out_dir else None)
+        print(json.dumps({"wrote": pack.get("wrote"), "n": pack["n_samples"], "spatial_accuracy": pack["spatial_accuracy"]}, indent=2))
+        return 0
+
+    rexp = sub.add_parser("research-export", help="Synthetic research pack; never physical")
+    rexp.add_argument("--site", default="gary")
+    rexp.add_argument("--n", type=int, default=5)
+    rexp.add_argument("--out-dir", default=None)
+    rexp.set_defaults(func=_cmd_research_export)
+
     args = p.parse_args(argv)
     return args.func(args)
 
