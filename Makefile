@@ -1,4 +1,4 @@
-.PHONY: setup lint test contract-test demo e2e clean gate6-dry-run
+.PHONY: setup lint test contract-test demo e2e smoke reproduce uml clean gate6-dry-run
 
 PY := PYTHONPATH=src
 
@@ -33,6 +33,12 @@ e2e:
 # Smoke test only — not evidence of readiness
 smoke: e2e
 
+reproduce:
+	$(PY) python3 scripts/reproduce.py
+
+uml:
+	@echo "GitHub renders Mermaid in docs/uml/current/*.md"
+	@echo "Optional PlantUML: ./docs/uml/render_plantuml.sh"
 
 e2e-tooling:
 	@mkdir -p results/tool_exports
