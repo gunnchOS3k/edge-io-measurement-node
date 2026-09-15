@@ -1,6 +1,12 @@
 """Privacy transforms for edge telemetry."""
 from __future__ import annotations
 
+from edge_io_node.privacy_transform import (
+    DENIED_EXPORT_FIELDS,
+    export_readiness_report,
+    transform_for_research_export,
+)
+
 ALLOWED_EXPORT = {
     "device_id_hash",
     "timestamp_iso",
@@ -15,15 +21,20 @@ ALLOWED_EXPORT = {
 
 
 def sanitize(sample: dict) -> dict:
-    if sample.get("consent_state") != "opt_in_active" and not sample.get("opt_in"):
-        raise ValueError("Export blocked: consent not active")
-    out = {k: sample.get(k) for k in ALLOWED_EXPORT if k in sample or k.replace("_percent", "_pct") in sample}
-    out["privacy_tier"] = sample.get("privacy_tier", "synthetic_tier_a")
-    out["device_id_hash"] = sample.get("device_id_hash", "redacted")
-    return {k: v for k, v in out.items() if v is not None}
+    return transform_for_research_export(sample)
 
 
 def privacy_report(samples: list[dict]) -> str:
-    lines = ["# Privacy Report", "", f"- Samples processed: {len(samples)}", "- PII fields stripped: none stored"]
-    lines.append("- Consent enforced: yes")
+    rep = export_readiness_report(samples)
+    lines = [
+        "# Privacy Report",
+        "",
+        f"- Samples processed: {rep['samples_total']}",
+        f"- Exportable: {rep['samples_exportable']}",
+        f"- Blocked (consent): {rep['samples_blocked_consent']}",
+        f"- Denied-field occurrences stripped: {rep['denied_field_occurrences_stripped']}",
+        "- Consent enforced: yes",
+        "- PHYSICAL_EVT_PASS: false",
+        f"- Denied field denylist size: {len(DENIED_EXPORT_FIELDS)}",
+    ]
     return "\n".join(lines) + "\n"
