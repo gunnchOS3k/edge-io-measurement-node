@@ -9,3 +9,14 @@
 ## Reproducibility
 
 See `docs/04_reproducibility_checklist.md` (or repo-specific checklist).
+
+## Feedback & security (RC1)
+
+- Public feedback: portal FEEDBACK.md
+- Security: private advisories only — see SECURITY.md
+
+## Feedback & Suggestions
+
+Public feedback: https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/FEEDBACK.md  
+Security (private): https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/SECURITY.md  
+Do not post exploitable security details publicly.
