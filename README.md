@@ -121,3 +121,11 @@ No commercial 6G · no certification · IMU alone ≠ absolute spatial registrat
 Full historical README: [docs/history/README_PRE_WP012.md](docs/history/README_PRE_WP012.md).
 
 Useful retained entrypoints: [docs/START_HERE.md](docs/START_HERE.md) · [docs/WHAT_IS_REAL_TODAY.md](docs/WHAT_IS_REAL_TODAY.md) · [docs/END_TO_END_READINESS.md](docs/END_TO_END_READINESS.md).
+
+## Feedback & Suggestions
+
+Tried this project? File public feedback via the ecosystem hub:
+
+https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/FEEDBACK.md
+
+Security vulnerabilities: private only — https://github.com/gunnchOS3k/gunnchos-research-portal/blob/main/SECURITY.md
