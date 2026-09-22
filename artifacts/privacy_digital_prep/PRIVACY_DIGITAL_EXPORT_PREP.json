@@ -1,0 +1,18 @@
+{
+  "schema": "gunnchos.edge_io.privacy_digital_export_prep.v1",
+  "prompt": "18",
+  "evidence_class": "DRAFT_DIGITAL_CANDIDATE",
+  "PHYSICAL_EVT_PASS": false,
+  "PHYSICAL_VALIDATION_PENDING": true,
+  "accepted_main_base_sha": "af57fbdac857ae386b23b5b747fdc05797621f92",
+  "capabilities_added": [
+    "DENIED_EXPORT_FIELDS denylist",
+    "transform_for_research_export",
+    "export_readiness_report"
+  ],
+  "non_claims": [
+    "Ring functional EVT",
+    "human ergonomics",
+    "carrier certification"
+  ]
+}
