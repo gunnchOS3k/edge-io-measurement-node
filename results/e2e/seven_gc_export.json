@@ -1,0 +1,74 @@
+{
+  "exports": [
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0000"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0001"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0002"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0003"
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "cpu_percent": 22.0,
+        "privacy_tier": "synthetic_tier_a",
+        "consent_state": "opt_in_active",
+        "packet_loss_percent": 0.1,
+        "memory_percent": 41.0,
+        "jitter_ms": 1.5,
+        "latency_ms": 12.0,
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "device_id_hash": "hash_0004"
+      }
+    }
+  ]
+}

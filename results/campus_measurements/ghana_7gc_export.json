@@ -1,0 +1,38 @@
+{
+  "plan": {
+    "site_id": "ghana",
+    "mode": "local-safe",
+    "allowed": [
+      "latency_ms",
+      "jitter_ms",
+      "packet_loss_pct",
+      "throughput_mbps_stub"
+    ],
+    "prohibited": [
+      "precise_gps",
+      "contact_list",
+      "message_content",
+      "biometrics"
+    ],
+    "consent_mode": "explicit_opt_in",
+    "privacy_tier": "tier_b_aggregate",
+    "evidence_status": "smoke_test_only",
+    "needs_local_validation": true
+  },
+  "measurement": {
+    "device_id_hash": "campus_ghana",
+    "timestamp_iso": "2026-01-01T12:00:00Z",
+    "consent_state": "opt_in_active",
+    "latency_ms": 12.0,
+    "jitter_ms": 1.5,
+    "packet_loss_percent": 0.1,
+    "cpu_percent": 22.0,
+    "memory_percent": 41.0,
+    "privacy_tier": "synthetic_tier_a",
+    "retention_policy": "delete_after_export_toy",
+    "opt_in": true,
+    "sanitized": true,
+    "evidence_status": "smoke_test_only"
+  },
+  "evidence_status": "smoke_test_only"
+}
