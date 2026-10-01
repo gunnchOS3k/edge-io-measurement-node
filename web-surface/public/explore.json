@@ -160,5 +160,6 @@
   "methods": "Methods are the campus measurement plans in configs/campus_measurement_profiles. REPRODUCIBILITY.md says the default path is digital and that executed Pixel 6a field measurements are not in this git tree. Absolute spatial accuracy remains physical-pending in that file.",
   "cards": [],
   "runtime_mode": "PRECOMPUTED",
-  "runtime_boot": false
+  "runtime_boot": false,
+  "evidence_class": "REFERENCE_IMPLEMENTATION"
 }
