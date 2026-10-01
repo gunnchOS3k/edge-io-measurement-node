@@ -1,0 +1,112 @@
+{
+  "schema": "gunnchos.surfacekit.v2",
+  "measured_topology": false,
+  "diagram_note": "Reading aid built from repository headings. It is not a measured topology and it is not a live system.",
+  "nodes": [
+    {
+      "id": "overview",
+      "label": "Overview"
+    },
+    {
+      "id": "what-is-this",
+      "label": "What is this?"
+    },
+    {
+      "id": "why-does-it-exist",
+      "label": "Why does it exist?"
+    },
+    {
+      "id": "where-does-it-fit",
+      "label": "Where does it fit?"
+    }
+  ],
+  "rows": [
+    {
+      "source": "README.md",
+      "scenario_id": "Overview",
+      "site_id": "7GC",
+      "ethical_framing": "# edge-io-measurement-node Ring / Edge I/O **sensing and measurement** stack for gunnchOS3k \u2014 privacy-first telemetry, firmware paths, and Lab-facing contracts. > **Current release/state:** `PHYSICAL_PENDING` \u2014 digital pipelines + synthetic smoke exist; absolute spatial accuracy on hardware is pending. Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) \u00b7 Product chart"
+    },
+    {
+      "source": "README.md",
+      "scenario_id": "What is this?",
+      "site_id": "7GC",
+      "ethical_framing": "Schemas, probes, firmware/research paths, and opt-in telemetry for Edge I/O Rings and related measurement nodes."
+    },
+    {
+      "source": "README.md",
+      "scenario_id": "Why does it exist?",
+      "site_id": "7GC",
+      "ethical_framing": "Embodied input and honest network/experience metrics need a dedicated measurement layer with consent and claim discipline."
+    },
+    {
+      "source": "README.md",
+      "scenario_id": "Where does it fit?",
+      "site_id": "7GC",
+      "ethical_framing": "Product Charter **layer 7** (Ring sensing/measurement). Consumed by `gunnchos-device-os` Ring/input paths."
+    },
+    {
+      "source": "README.md",
+      "scenario_id": "What is real today?",
+      "site_id": "7GC",
+      "ethical_framing": "- Schema-validated synthetic / smoke telemetry (`make smoke` / `make e2e`) - Privacy helpers and 7GC/Lab export contracts - Firmware and gate1 digital fabrication *research* artifacts as documented in-tree"
+    },
+    {
+      "source": "README.md",
+      "scenario_id": "What is simulated / modelled?",
+      "site_id": "7GC",
+      "ethical_framing": "- Synthetic measurement batches and emulator-style probes - Spatial accuracy labelled SIMULATED until physical calibration"
+    }
+  ],
+  "sources": [],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "body": "# edge-io-measurement-node Ring / Edge I/O **sensing and measurement** stack for gunnchOS3k \u2014 privacy-first telemetry, firmware paths, and Lab-facing contracts. > **Current release/state:** `PHYSICAL_PENDING` \u2014 digital pipelines + synthetic smoke exist; absolute spatial accuracy on hardware is pending. Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) \u00b7 Product chart"
+    },
+    {
+      "id": "what-is-this",
+      "title": "What is this?",
+      "body": "Schemas, probes, firmware/research paths, and opt-in telemetry for Edge I/O Rings and related measurement nodes."
+    },
+    {
+      "id": "why-does-it-exist",
+      "title": "Why does it exist?",
+      "body": "Embodied input and honest network/experience metrics need a dedicated measurement layer with consent and claim discipline."
+    },
+    {
+      "id": "where-does-it-fit",
+      "title": "Where does it fit?",
+      "body": "Product Charter **layer 7** (Ring sensing/measurement). Consumed by `gunnchos-device-os` Ring/input paths."
+    },
+    {
+      "id": "what-is-real-today",
+      "title": "What is real today?",
+      "body": "- Schema-validated synthetic / smoke telemetry (`make smoke` / `make e2e`) - Privacy helpers and 7GC/Lab export contracts - Firmware and gate1 digital fabrication *research* artifacts as documented in-tree"
+    },
+    {
+      "id": "what-is-simulated-modelled",
+      "title": "What is simulated / modelled?",
+      "body": "- Synthetic measurement batches and emulator-style probes - Spatial accuracy labelled SIMULATED until physical calibration"
+    }
+  ],
+  "artifacts": [
+    "paper/CONFERENCE_READINESS_TODOS.md",
+    "paper/README.md",
+    "paper/abstract.md",
+    "paper/claims_needing_evidence.md",
+    "paper/draft.md",
+    "paper/ethics_statement.md",
+    "paper/evaluation_plan.md",
+    "paper/experiments_needed.md",
+    "paper/figures_needed.md",
+    "paper/implementation.md",
+    "paper/introduction.md",
+    "paper/limitations.md"
+  ],
+  "methods": "# Reproducibility \u2014 Edge-IO Measurement Node (RQ3) This repository\u2019s default path is **digital**: simulated device, consent, telemetry schema, privacy sanitization, anti-replay counters, and research export. It does **not** contain executed Pixel 6a field measurements in git. Absolute spatial accuracy remains **PHYSICAL_PENDING**. IMU (ring classifier) is **relative cues only**, not validated absolute pose. No University of Oulu affiliation is claimed. ## Clone / setup / run ```bash git clone https://github.com/gunnchOS3k/edge-io-measurement-node.git cd edge-io-measurement-node python3 -m venv .venv source .venv/bin/activate pip install -r requirements.txt make test make smoke # long e2e; sy",
+  "cards": [],
+  "runtime_mode": "PRECOMPUTED",
+  "runtime_boot": false
+}
