@@ -1,64 +1,116 @@
 {
   "schema": "gunnchos.surfacekit.v2",
   "measured_topology": false,
-  "diagram_note": "Reading aid built from repository headings. It is not a measured topology and it is not a live system.",
+  "diagram_note": "Measurement plans copied from configs/campus_measurement_profiles. These YAML files list allowed and prohibited measurements. They are not executed field results. Pixel 6a field measurements are not in git, per REPRODUCIBILITY.md.",
   "nodes": [
     {
-      "id": "overview",
-      "label": "Overview"
+      "id": "site",
+      "label": "Site profile"
     },
     {
-      "id": "what-is-this",
-      "label": "What is this?"
+      "id": "allowed",
+      "label": "Allowed measure"
     },
     {
-      "id": "why-does-it-exist",
-      "label": "Why does it exist?"
-    },
-    {
-      "id": "where-does-it-fit",
-      "label": "Where does it fit?"
+      "id": "privacy",
+      "label": "Privacy tier"
     }
   ],
   "rows": [
     {
-      "source": "README.md",
-      "scenario_id": "Overview",
-      "site_id": "7GC",
-      "ethical_framing": "# edge-io-measurement-node Ring / Edge I/O **sensing and measurement** stack for gunnchOS3k \u2014 privacy-first telemetry, firmware paths, and Lab-facing contracts. > **Current release/state:** `PHYSICAL_PENDING` \u2014 digital pipelines + synthetic smoke exist; absolute spatial accuracy on hardware is pending. Ecosystem portal: [gunnchos-research-portal](https://github.com/gunnchOS3k/gunnchos-research-portal) \u00b7 Product chart"
+      "source": "configs/campus_measurement_profiles/gary.yaml",
+      "scenario_id": "gary",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "gary",
+      "privacy_tier": "tier_b_aggregate",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     },
     {
-      "source": "README.md",
-      "scenario_id": "What is this?",
-      "site_id": "7GC",
-      "ethical_framing": "Schemas, probes, firmware/research paths, and opt-in telemetry for Edge I/O Rings and related measurement nodes."
+      "source": "configs/campus_measurement_profiles/gaza.yaml",
+      "scenario_id": "gaza",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "gaza",
+      "privacy_tier": "aggregate_only",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     },
     {
-      "source": "README.md",
-      "scenario_id": "Why does it exist?",
-      "site_id": "7GC",
-      "ethical_framing": "Embodied input and honest network/experience metrics need a dedicated measurement layer with consent and claim discipline."
+      "source": "configs/campus_measurement_profiles/geelong.yaml",
+      "scenario_id": "geelong",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "geelong",
+      "privacy_tier": "tier_b_aggregate",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     },
     {
-      "source": "README.md",
-      "scenario_id": "Where does it fit?",
-      "site_id": "7GC",
-      "ethical_framing": "Product Charter **layer 7** (Ring sensing/measurement). Consumed by `gunnchos-device-os` Ring/input paths."
+      "source": "configs/campus_measurement_profiles/germany.yaml",
+      "scenario_id": "germany",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "germany",
+      "privacy_tier": "tier_b_aggregate",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     },
     {
-      "source": "README.md",
-      "scenario_id": "What is real today?",
-      "site_id": "7GC",
-      "ethical_framing": "- Schema-validated synthetic / smoke telemetry (`make smoke` / `make e2e`) - Privacy helpers and 7GC/Lab export contracts - Firmware and gate1 digital fabrication *research* artifacts as documented in-tree"
+      "source": "configs/campus_measurement_profiles/ghana.yaml",
+      "scenario_id": "ghana",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "ghana",
+      "privacy_tier": "tier_b_aggregate",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     },
     {
-      "source": "README.md",
-      "scenario_id": "What is simulated / modelled?",
-      "site_id": "7GC",
-      "ethical_framing": "- Synthetic measurement batches and emulator-style probes - Spatial accuracy labelled SIMULATED until physical calibration"
+      "source": "configs/campus_measurement_profiles/graham_land.yaml",
+      "scenario_id": "graham_land",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "graham_land",
+      "privacy_tier": "aggregate_only",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
+    },
+    {
+      "source": "configs/campus_measurement_profiles/guyana.yaml",
+      "scenario_id": "guyana",
+      "evidence_class": "measurement_plan",
+      "ethical_framing": "Campus profile is a measurement plan. REPRODUCIBILITY.md says executed Pixel 6a field measurements are not in git.",
+      "site_id": "guyana",
+      "privacy_tier": "tier_b_aggregate",
+      "consent_mode": "explicit_opt_in",
+      "allowed_measurements": "latency_ms, jitter_ms, packet_loss_pct, throughput_mbps_stub",
+      "prohibited_measurements": "precise_gps, contact_list, message_content, biometrics",
+      "low_bandwidth_mode": "true"
     }
   ],
-  "sources": [],
+  "sources": [
+    "configs/campus_measurement_profiles/gary.yaml",
+    "configs/campus_measurement_profiles/gaza.yaml",
+    "configs/campus_measurement_profiles/geelong.yaml",
+    "configs/campus_measurement_profiles/germany.yaml",
+    "configs/campus_measurement_profiles/ghana.yaml",
+    "configs/campus_measurement_profiles/graham_land.yaml",
+    "configs/campus_measurement_profiles/guyana.yaml"
+  ],
   "sections": [
     {
       "id": "overview",
@@ -105,7 +157,7 @@
     "paper/introduction.md",
     "paper/limitations.md"
   ],
-  "methods": "# Reproducibility \u2014 Edge-IO Measurement Node (RQ3) This repository\u2019s default path is **digital**: simulated device, consent, telemetry schema, privacy sanitization, anti-replay counters, and research export. It does **not** contain executed Pixel 6a field measurements in git. Absolute spatial accuracy remains **PHYSICAL_PENDING**. IMU (ring classifier) is **relative cues only**, not validated absolute pose. No University of Oulu affiliation is claimed. ## Clone / setup / run ```bash git clone https://github.com/gunnchOS3k/edge-io-measurement-node.git cd edge-io-measurement-node python3 -m venv .venv source .venv/bin/activate pip install -r requirements.txt make test make smoke # long e2e; sy",
+  "methods": "Methods are the campus measurement plans in configs/campus_measurement_profiles. REPRODUCIBILITY.md says the default path is digital and that executed Pixel 6a field measurements are not in this git tree. Absolute spatial accuracy remains physical-pending in that file.",
   "cards": [],
   "runtime_mode": "PRECOMPUTED",
   "runtime_boot": false
