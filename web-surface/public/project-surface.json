@@ -1,0 +1,20 @@
+{
+  "repo": "edge-io-measurement-node",
+  "productName": "Edge I/O measurement node",
+  "family": "7GC",
+  "classification": "STATIC_RESEARCH_SURFACE_WORKER",
+  "acceptedSha": "f357b4c0fcfa77ea74d88e3263467dc60ec8cb2a",
+  "status": "STAGING_WORKER",
+  "summary": "Measurement-plan and privacy-transform research for an edge I/O node.",
+  "capabilities": [
+    "Read the measurement and privacy boundaries",
+    "Open the source repository"
+  ],
+  "limitations": [
+    "This page does not operate a radio or collect live measurements"
+  ],
+  "sourceUrl": "https://github.com/gunnchOS3k/edge-io-measurement-node",
+  "returnUrlEnv": "GUNNCHOS_PORTAL_URL",
+  "returnUrl": "https://gunnchos-site.gunnchos-finds.workers.dev",
+  "workerName": "gunnchos-edge-io"
+}
