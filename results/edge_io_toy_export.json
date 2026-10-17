@@ -1,0 +1,76 @@
+{
+  "n_samples": 5,
+  "samples": [
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "device_id_hash": "hash_0000",
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "latency_ms": 12.0,
+        "jitter_ms": 1.5,
+        "packet_loss_pct": 0.1,
+        "rssi_dbm": null,
+        "cpu_pct": null,
+        "gpu_pct": null,
+        "opt_in": true
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "device_id_hash": "hash_0001",
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "latency_ms": 12.0,
+        "jitter_ms": 1.5,
+        "packet_loss_pct": 0.1,
+        "rssi_dbm": null,
+        "cpu_pct": null,
+        "gpu_pct": null,
+        "opt_in": true
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "device_id_hash": "hash_0002",
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "latency_ms": 12.0,
+        "jitter_ms": 1.5,
+        "packet_loss_pct": 0.1,
+        "rssi_dbm": null,
+        "cpu_pct": null,
+        "gpu_pct": null,
+        "opt_in": true
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "device_id_hash": "hash_0003",
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "latency_ms": 12.0,
+        "jitter_ms": 1.5,
+        "packet_loss_pct": 0.1,
+        "rssi_dbm": null,
+        "cpu_pct": null,
+        "gpu_pct": null,
+        "opt_in": true
+      }
+    },
+    {
+      "site_id": "gary",
+      "telemetry": {
+        "device_id_hash": "hash_0004",
+        "timestamp_iso": "2026-01-01T12:00:00Z",
+        "latency_ms": 12.0,
+        "jitter_ms": 1.5,
+        "packet_loss_pct": 0.1,
+        "rssi_dbm": null,
+        "cpu_pct": null,
+        "gpu_pct": null,
+        "opt_in": true
+      }
+    }
+  ],
+  "note": "synthetic opt-in telemetry"
+}
