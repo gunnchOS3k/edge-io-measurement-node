@@ -351,6 +351,41 @@ def _read_mem_pct() -> float:
         return 0.0
 
 
+_PHYSICAL_EVIDENCE_LEVELS = frozenset(
+    {
+        "controlled_device_measurement",
+        "physical",
+        "physical_sensor",
+        "physical_measurement",
+    }
+)
+_SYNTHETIC_TOKENS = ("synthetic", "emulator", "fixture", "simulated")
+
+
+def _is_synthetic_fixture(
+    *,
+    collector: str,
+    source: str,
+    device: dict[str, Any],
+    samples: list[dict[str, Any]],
+) -> bool:
+    parts = [
+        collector,
+        source,
+        str(device.get("device_class") or ""),
+        str(device.get("model_label") or ""),
+    ]
+    for sample in samples:
+        flags = sample.get("quality_flags") or []
+        if isinstance(flags, list):
+            parts.extend(str(flag) for flag in flags)
+        for key in ("evidence_level", "input_class", "measurement_class"):
+            if sample.get(key):
+                parts.append(str(sample[key]))
+    blob = " ".join(parts).lower()
+    return any(token in blob for token in _SYNTHETIC_TOKENS)
+
+
 def build_batch(
     session: MeasurementSession,
     *,
@@ -364,8 +399,21 @@ def build_batch(
     if session.deleted:
         raise RuntimeError("Session was deleted")
     session.consent.ensure_active_for_collection()
-    if evidence_level == "controlled_device_measurement" and collector == "deterministic_emulator":
-        raise ValueError("Cannot label emulator output as controlled_device_measurement")
+    synthetic_fixture = _is_synthetic_fixture(
+        collector=collector,
+        source=source,
+        device=device,
+        samples=session.samples,
+    )
+    if evidence_level in _PHYSICAL_EVIDENCE_LEVELS and synthetic_fixture:
+        raise ValueError("Cannot label synthetic fixture output as a physical measurement")
+    if not notes:
+        if evidence_level == "synthetic" or synthetic_fixture:
+            notes = "Synthetic fixture"
+        elif evidence_level in _PHYSICAL_EVIDENCE_LEVELS:
+            notes = "Physical-device capture"
+        else:
+            notes = f"Evidence class recorded as {evidence_level}"
     payload = {
         "schema_name": "gunnchos.edge_measurement_batch",
         "schema_version": "1.0.0",
@@ -393,12 +441,7 @@ def build_batch(
             "collector": collector,
             "generated_at": utc_now_iso(),
             "source": source,
-            "notes": notes
-            or (
-                "Synthetic fixture"
-                if evidence_level == "synthetic"
-                else "Physical-device capture"
-            ),
+            "notes": notes,
         },
         "evidence_level": evidence_level,
     }
