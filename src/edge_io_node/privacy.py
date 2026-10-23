@@ -15,7 +15,12 @@ ALLOWED_EXPORT = {
 
 
 def sanitize(sample: dict) -> dict:
-    if sample.get("consent_state") != "opt_in_active" and not sample.get("opt_in"):
+    consent = sample.get("consent_state")
+    opt_in = bool(sample.get("opt_in"))
+    # An explicit non-active consent state wins over a leftover opt_in flag.
+    if consent == "opt_in_active" or (consent in (None, "") and opt_in):
+        pass
+    else:
         raise ValueError("Export blocked: consent not active")
     out = {k: sample.get(k) for k in ALLOWED_EXPORT if k in sample or k.replace("_percent", "_pct") in sample}
     out["privacy_tier"] = sample.get("privacy_tier", "synthetic_tier_a")

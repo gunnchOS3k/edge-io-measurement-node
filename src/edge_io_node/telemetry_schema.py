@@ -30,6 +30,8 @@ class TelemetrySample:
 
     def to_dict(self) -> dict:
         self.validate()
+        if self.consent_state == "opt_out":
+            raise ValueError("Telemetry export blocked: consent opted out")
         if self.consent_state != "opt_in_active" and not self.opt_in:
             raise ValueError("Telemetry export requires opt_in or opt_in_active consent")
         return asdict(self)

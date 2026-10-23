@@ -14,3 +14,15 @@ def test_sanitize_strips_unlisted():
         "secret_field": "x",
     })
     assert "secret_field" not in clean
+
+
+def test_opt_out_blocks_even_if_opt_in_flag_remains():
+    import pytest
+
+    with pytest.raises(ValueError, match="consent not active"):
+        sanitize({
+            "device_id_hash": "hash_0001",
+            "consent_state": "opt_out",
+            "opt_in": True,
+            "latency_ms": 1.0,
+        })
